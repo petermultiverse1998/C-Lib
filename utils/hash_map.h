@@ -8,6 +8,16 @@
 #define HASH_MAP_SIZE 10
 #define Type void*
 
+struct HashMapEntry {
+    int key;
+    Type value;
+    struct HashMapEntry *nextEntry;
+};
+
+struct HashMap {
+    int size;
+    struct HashMapEntry *entries[HASH_MAP_SIZE];
+};
 typedef struct HashMap HashMap;
 
 struct HashMapControl {
@@ -80,7 +90,5 @@ struct HashMapControl {
 };
 
 extern struct HashMapControl StaticHashMap;
-
-void hash_test();
 
 #endif //C_LIB_HASH_MAP_H
