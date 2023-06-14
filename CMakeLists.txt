@@ -14,8 +14,8 @@ add_executable(
         utils/linked_list.c
         utils/linked_list.h
 
-#        utils/hash_map_test.c
-        test/test_test.c
-
 #        main.c
+#        test/test_test.c
+        utils/hash_map_test.c
+
 )
