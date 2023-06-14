@@ -52,8 +52,4 @@ int POINTER_EQUALS(char *filename, int lineNumber, void *expected, void *actual)
 int BOOLEAN_IS_TRUE(char *filename, int lineNumber, int isTrue);
 int BOOLEAN_IS_FALSE(char *filename, int lineNumber, int isFalse);
 
-
-__attribute__((unused)) void test_test();
-
-
 #endif //C_LIB_TEST_H

@@ -40,7 +40,7 @@ static int test17(){return BOOLEAN_IS_TRUE(__FILE__, __LINE__,1);}
 static int test18(){return BOOLEAN_IS_FALSE(__FILE__, __LINE__,0);}
 
 
-__attribute__((unused)) void test_test() {
+int main() {
 
     Test test = StaticTest.new();
 
@@ -64,4 +64,6 @@ __attribute__((unused)) void test_test() {
     StaticTest.addTask(&test, test18);
 
     StaticTest.run(&test);
+
+    return 0;
 }

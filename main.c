@@ -4,8 +4,8 @@
 
 
 int main() {
-//    test_test();
-    hash_test();
+    test_test();
+//    hash_test();
 
     return 0;
 }
