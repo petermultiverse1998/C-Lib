@@ -408,7 +408,7 @@ int BOOLEAN_IS_TRUE(char *filename, int lineNumber, int isTrue) {
 }
 
 int BOOLEAN_IS_FALSE(char *filename, int lineNumber, int isFalse) {
-    if (isFalse)
+    if (!isFalse)
         return 1;
 
     SOURCE(filename, lineNumber);
