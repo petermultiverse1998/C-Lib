@@ -5,7 +5,7 @@
 #ifndef C_LIB_HASH_MAP_H
 #define C_LIB_HASH_MAP_H
 
-#define HASH_MAP_SIZE 10
+#define HASH_MAP_SIZE 5
 #define Type void*
 
 struct HashMapEntry {
@@ -77,10 +77,10 @@ struct HashMapControl {
     /**
      * Computation Cost : O(n^2)\n
      * It delete all the entries and free memories allocated by map
-     * @param map   : HashMap
+     * @param mapPtr: Address of pointer toHashMap
      * @return      : 1 for success (OR) 0 for failed
      */
-    int (*free)(HashMap *map);
+    int (*free)(HashMap **mapPtr);
 
     /**
      * Prints the contents of hash map
