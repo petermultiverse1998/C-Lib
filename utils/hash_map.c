@@ -84,7 +84,7 @@ static void print(HashMap *map) {
         for (int j = 0; j < MAX_LOOP; ++j) {
             if (entry == NULL)
                 break;
-            printf("%d >> ", entry->key);
+            printf("0x%02x >> ", entry->key);
             entry = entry->nextEntry;
         }
         printf("\n");
@@ -254,7 +254,7 @@ static HashMap *getKeys(HashMap *map, int keys[]) {
 
     int size = map->size;
     int keyIndex = 0;
-    for (int entryIndex = 0; entryIndex < MAP_SIZE; ++entryIndex) {
+    for (int entryIndex = 0; entryIndex < size; ++entryIndex) {
         //Get top entry
         Entry *entry = map->entries[entryIndex];
 
@@ -307,11 +307,10 @@ static int isKeyExist(HashMap *map, int key) {
 /**
  * Computation Cost : O(n^2)\n
  * It delete all the entries and free memories allocated by map
- * @param mapPtr: Address of pointer to HashMap
+ * @param map   : HashMap
  * @return      : 1 for success (OR) 0 for failed
  */
-static int freeMap(HashMap **mapPtr) {
-    HashMap *map = *mapPtr;
+static int freeMap(HashMap *map) {
     //If map is NULL
     if (map == NULL)
         return 0;
@@ -321,7 +320,6 @@ static int freeMap(HashMap **mapPtr) {
     if (size == 0) {
         //Free hash map memory
         freeMemory(map, sizeof(HashMap));
-        *mapPtr=NULL;
         return 1;
     }
 
@@ -331,6 +329,7 @@ static int freeMap(HashMap **mapPtr) {
     //Get all keys
     getKeys(map, keys);
 
+
     //Delete all entries
     for (int i = 0; i < size; ++i)
         delete(map, keys[i]);
@@ -338,10 +337,9 @@ static int freeMap(HashMap **mapPtr) {
     //Free memory for hash map
     freeMemory(map, sizeof(HashMap));
 
-    *mapPtr=NULL;
-
     return 1; //freeing memory success
 }
+
 
 struct HashMapControl StaticHashMap = {
         .new=new,
