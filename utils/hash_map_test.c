@@ -23,7 +23,7 @@ static int testNew() {
     check = check && INT_EQUALS(__FILE__, __LINE__,0,map->size);
 
     printf("testNew\n");
-    StaticHashMap.free(map);
+    StaticHashMap.free(&map);
     return check;
 }
 
@@ -60,7 +60,7 @@ static int testInsert() {
     check = check && DOUBLE_ARRAY_EQUALS(__FILE__, __LINE__,values,mapValues,4);
 
     printf("testInsert\n");
-    StaticHashMap.free(map);
+    StaticHashMap.free(&map);
     return check;
 }
 
@@ -81,7 +81,7 @@ static int testGet() {
     int check = DOUBLE_ARRAY_EQUALS(__FILE__, __LINE__,values,mapValues,4);
 
     printf("testGet\n");
-    StaticHashMap.free(map);
+    StaticHashMap.free(&map);
     return check;
 }
 
@@ -110,7 +110,7 @@ static int testDelete() {
     check = check && DOUBLE_EQUALS(__FILE__,__LINE__,*(double *)map->entries[hashFunc(keys[3])]->value,values[3]);
 
     printf("testDelete\n");
-    StaticHashMap.free(map);
+    StaticHashMap.free(&map);
     return check;
 }
 
@@ -130,7 +130,7 @@ static int testGetKeys() {
     check = check && INT_ARRAY_EQUALS(__FILE__, __LINE__,keys,mapKeys,4);
 
     printf("testGetKeys\n");
-    StaticHashMap.free(map);
+    StaticHashMap.free(&map);
     return check;
 }
 
@@ -153,7 +153,7 @@ static int testIsKeyExist() {
     check = check && BOOLEAN_IS_FALSE(__FILE__, __LINE__,StaticHashMap.isKeyExist(map,1000));;
 
     printf("testIsKeyExist\n");
-    StaticHashMap.free(map);
+    StaticHashMap.free(&map);
     return check;
 }
 
@@ -167,15 +167,28 @@ static int testFree() {
     StaticHashMap.insert(map, keys[2], &values[2]);
     StaticHashMap.insert(map, keys[3], &values[3]);
 
-    int check = BOOLEAN_IS_TRUE(__FILE__, __LINE__,StaticHashMap.free(map));
-//    check = check && BOOLEAN_IS_TRUE(__FILE__, __LINE__,StaticHashMap.free(map));
+    int check = BOOLEAN_IS_TRUE(__FILE__, __LINE__,StaticHashMap.free(&map));
+    check = check && BOOLEAN_IS_FALSE(__FILE__, __LINE__,StaticHashMap.free(&map));
 
-//    StaticHashMap.free(map);
+    StaticHashMap.free(&map);
     printf("testFree\n");
     return check;
 }
 
+static void testPrint() {
+    int keys[] = {1, 2, 3, 13};
+    double values[] = {1.2, 3.4, 6.8, 7.9};
 
+    HashMap *map = StaticHashMap.new();
+    StaticHashMap.insert(map, keys[0], &values[0]);
+    StaticHashMap.insert(map, keys[1], &values[1]);
+    StaticHashMap.insert(map, keys[2], &values[2]);
+    StaticHashMap.insert(map, keys[3], &values[3]);
+
+    StaticHashMap.print(map);
+
+    StaticHashMap.free(&map);
+}
 
 int main() {
     Test test = StaticTest.new();
@@ -189,6 +202,7 @@ int main() {
     StaticTest.addTask(&test, testFree);
 
     StaticTest.run(&test);
+    testPrint();
 
 
     return 0;
