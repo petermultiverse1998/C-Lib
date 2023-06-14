@@ -10,12 +10,14 @@
 #define MAP_SIZE HASH_MAP_SIZE
 #define MAX_LOOP 1000
 
+typedef struct HashMapEntry Entry;
+
 /**
  * This converts key into hasKey
  * @param key   : Actual Key
  * @return      : Hash Key
  */
-static int hashFunc(int key) {
+int hashFunc(int key) {
     return key % MAP_SIZE;
 }
 
@@ -43,18 +45,6 @@ static int freeMemory(void *pointer, int sizeInByte) {
     free(pointer);
     return 1;
 }
-
-struct Entry {
-    int key;
-    Type value;
-    struct Entry *nextEntryPtr;
-};
-typedef struct Entry Entry;
-
-struct HashMap {
-    int size;
-    Entry *entries[MAP_SIZE];
-};
 
 /**
  * Computation Cost : O(1)\n
@@ -95,7 +85,7 @@ static void print(HashMap *map) {
             if (entry == NULL)
                 break;
             printf("0x%02x >> ", entry->key);
-            entry = entry->nextEntryPtr;
+            entry = entry->nextEntry;
         }
         printf("\n");
     }
@@ -124,7 +114,7 @@ static HashMap *insert(HashMap *map, int key, Type value) {
     //Fill the data in entry
     newEntry->key = key;
     newEntry->value = value;
-    newEntry->nextEntryPtr = NULL;//make next entry is empty
+    newEntry->nextEntry = NULL;//make next entry is empty
 
     //Calculate hashKey
     int hashKey = hashFunc(key);
@@ -136,25 +126,22 @@ static HashMap *insert(HashMap *map, int key, Type value) {
         //If top entry is empty fill the entry
         map->entries[hashKey] = newEntry;
     } else {
-        //Check if key already exist
-        if (entry->key == key) {
-            //Only update value
-            entry->value = value;
-            return map;
-        }
-
-        //If top entry is not empty get next entry
-        Entry *nextEntry = entry->nextEntryPtr;
         int l = 0;
         for (; l < MAX_LOOP; ++l) {
-            //If this entry is empty(@NULL) break
-            if (nextEntry == NULL) {
-                entry->nextEntryPtr = newEntry;
+            //Check if key already exist
+            if (entry->key == key) {
+                //Only update value
+                entry->value = value;
+                return map;
+            }
+
+            //If next entry is empty(@NULL) break
+            if (entry->nextEntry == NULL) {
+                entry->nextEntry = newEntry;
                 break;
             }
             //If this entry is not empty select next entry
-            entry = nextEntry;
-            nextEntry = nextEntry->nextEntryPtr;
+            entry = entry->nextEntry;
         }
 
         //If @MAX_LOOP exceeds then entry is not inserted
@@ -163,10 +150,10 @@ static HashMap *insert(HashMap *map, int key, Type value) {
             free(newEntry);
             return NULL;
         }
-
-        //If entry is inserted then increase the size
-        map->size++;
     }
+    //If entry is inserted then increase the size
+    map->size++;
+
     //Return same @map
     return map;
 }
@@ -198,7 +185,7 @@ static Type get(HashMap *map, int key) {
             return entry->value;
 
         //If key is not found then go to next entry
-        entry = entry->nextEntryPtr;
+        entry = entry->nextEntry;
     }
     //If loop exceeds the limit and no key is found then return NULL
     return NULL;
@@ -231,14 +218,14 @@ static HashMap *delete(HashMap *map, int key) {
         //Key found
         if (entry->key == key) {
             //Copy next entry
-            Entry *nextEntry = entry->nextEntryPtr;
+            Entry *nextEntry = entry->nextEntry;
 
             if (prevEntry == NULL)
                 // If prevEntry is NULL then this entry is top entry
                 map->entries[hashKey] = nextEntry;
             else
                 // If prevEntry is not NULL then this entry is branch entry
-                prevEntry->nextEntryPtr = nextEntry;
+                prevEntry->nextEntry = nextEntry;
 
             //Decrease the size
             map->size--;
@@ -247,7 +234,7 @@ static HashMap *delete(HashMap *map, int key) {
 
         //Go to next entry if key is not found
         prevEntry = entry;
-        entry = entry->nextEntryPtr;
+        entry = entry->nextEntry;
     }
     //If key is not found return NULL
     return NULL;
@@ -278,7 +265,7 @@ static HashMap *getKeys(HashMap *map, int keys[]) {
 
             //If entry is not empty
             keys[keyIndex++] = entry->key;// Copy key and increase keyIndex
-            entry = entry->nextEntryPtr;//Go to next entry
+            entry = entry->nextEntry;//Go to next entry
         }
     }
     return map;
@@ -311,7 +298,7 @@ static int isKeyExist(HashMap *map, int key) {
             return 1;
 
         //If key is not found then go to next entry
-        entry = entry->nextEntryPtr;
+        entry = entry->nextEntry;
     }
     //If loop exceeds the limit and no key is found then return false
     return 0;
