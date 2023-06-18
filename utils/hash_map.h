@@ -5,12 +5,13 @@
 #ifndef C_LIB_HASH_MAP_H
 #define C_LIB_HASH_MAP_H
 
-#define HASH_MAP_SIZE 5
-#define Type void*
+#define HASH_MAP_SIZE 3
+#define HashMapType void*
+#define HASH_MAP_NULL NULL
 
 struct HashMapEntry {
     int key;
-    Type value;
+    HashMapType value;
     struct HashMapEntry *nextEntry;
 };
 
@@ -33,10 +34,10 @@ struct HashMapControl {
      * It inserts the value in map
      * @param map   : HashMap
      * @param key   : Key for value
-     * @param value : Value to be inserted of type Type
+     * @param value : Value to be inserted of type HashMapType
      * @return      : Same map (OR) NULL if heap is full or map is null
      */
-    HashMap *(*insert)(HashMap *map, int key, Type value);
+    HashMap *(*insert)(HashMap *map, int key, HashMapType value);
 
     /**
      * Computation Cost : O(1)\n
@@ -45,7 +46,7 @@ struct HashMapControl {
      * @param key   : Key for value
      * @return      : Value corresponding to free the key (OR) NULL if key doesn't exist found
      */
-    Type(*get)(HashMap *map, int key);
+    HashMapType(*get)(HashMap *map, int key);
 
     /**
      * Computation Cost : O(1)\n
