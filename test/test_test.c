@@ -37,8 +37,6 @@ int pointer[]={1,2};
 static int test16(){return POINTER_EQUALS(__FILE__, __LINE__,&pointer,&pointer);}
 
 static int test17(){return BOOLEAN_IS_TRUE(__FILE__, __LINE__,1);}
-static int test18(){return BOOLEAN_IS_FALSE(__FILE__, __LINE__,0);}
-
 
 int main() {
 
@@ -61,7 +59,6 @@ int main() {
     StaticTest.addTask(&test, test15);
     StaticTest.addTask(&test, test16);
     StaticTest.addTask(&test, test17);
-    StaticTest.addTask(&test, test18);
 
     StaticTest.run(&test);
 

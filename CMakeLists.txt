@@ -11,11 +11,11 @@ add_executable(
         utils/hash_map.c
         utils/hash_map.h
 
-        utils/linked_list.c
-        utils/linked_list.h
+        utils/queue.c
+        utils/queue.h
 
-#        test/test_test.c
-        utils/hash_map_test.c
-#        main.c
-
+        #        test/test_test.c
+        #        utils/hash_map_test.c
+        #        utils/queue_test.c
+        main.c
 )

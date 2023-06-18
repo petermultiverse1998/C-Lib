@@ -96,10 +96,10 @@ static void print(HashMap *map) {
  * It inserts the value in map
  * @param map   : HashMap
  * @param key   : Key for value
- * @param value : Value to be inserted of type Type
+ * @param value : Value to be inserted of type HashMapType
  * @return      : Same map (OR) NULL if heap is full or map is null
  */
-static HashMap *insert(HashMap *map, int key, Type value) {
+static HashMap *insert(HashMap *map, int key, HashMapType value) {
     //If map is NULL then return NULL
     if (map == NULL)
         return NULL;
@@ -165,10 +165,10 @@ static HashMap *insert(HashMap *map, int key, Type value) {
  * @param key   : Key for value
  * @return      : Value corresponding to the key (OR) NULL if key doesn't exist found
  */
-static Type get(HashMap *map, int key) {
+static HashMapType get(HashMap *map, int key) {
     //If map is NULL return NULL
     if (map == NULL)
-        return map;
+        return HASH_MAP_NULL;
 
     //Calculate hashKey
     int hashKey = hashFunc(key);
@@ -178,7 +178,7 @@ static Type get(HashMap *map, int key) {
     for (int l = 0; l < MAX_LOOP; ++l) {
         //If this entry is empty value doesn't exist in map so return NULL
         if (entry == NULL)
-            return NULL;
+            return HASH_MAP_NULL;
 
         //If key is found return value
         if (entry->key == key)
@@ -188,7 +188,7 @@ static Type get(HashMap *map, int key) {
         entry = entry->nextEntry;
     }
     //If loop exceeds the limit and no key is found then return NULL
-    return NULL;
+    return HASH_MAP_NULL;
 }
 
 /**
@@ -252,7 +252,6 @@ static HashMap *getKeys(HashMap *map, int keys[]) {
     if (map == NULL)
         return NULL;
 
-    int size = map->size;
     int keyIndex = 0;
     for (int entryIndex = 0; entryIndex < MAP_SIZE; ++entryIndex) {
         //Get top entry
