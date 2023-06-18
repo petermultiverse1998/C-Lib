@@ -402,19 +402,7 @@ int BOOLEAN_IS_TRUE(char *filename, int lineNumber, int isTrue) {
     SOURCE(filename, lineNumber);
     RED;
     printf("expected : %s \n", "TRUE");
-    printf("actual : %s \n", isTrue?"TRUE":"FALSE");
-    RESET;
-    return 0;
-}
-
-int BOOLEAN_IS_FALSE(char *filename, int lineNumber, int isFalse) {
-    if (!isFalse)
-        return 1;
-
-    SOURCE(filename, lineNumber);
-    RED;
-    printf("expected : %s \n", "FALSE");
-    printf("actual : %s \n", isFalse?"FALSE":"TRUE");
+    printf("actual : %s \n", "FALSE");
     RESET;
     return 0;
 }

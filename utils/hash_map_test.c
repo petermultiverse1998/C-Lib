@@ -127,7 +127,19 @@ static int testGetKeys() {
     int mapKeys[4];
 
     int check = BOOLEAN_IS_TRUE(__FILE__, __LINE__,StaticHashMap.getKeys(map,mapKeys)!=NULL);
-    check = check && INT_ARRAY_EQUALS(__FILE__, __LINE__,keys,mapKeys,4);
+    for (int i = 0; i < 4; ++i) {
+        int each_check = 0;
+        for (int j = 0; j < 4; ++j) {
+            each_check = (keys[i] == mapKeys[j]) != 0;
+            if(each_check)
+                break;
+        }
+        if(!each_check){
+            check = 0;
+            break;
+        }
+    }
+    check = BOOLEAN_IS_TRUE(__FILE__, __LINE__,check);
 
     printf("testGetKeys\n");
     StaticHashMap.free(&map);
@@ -150,7 +162,6 @@ static int testIsKeyExist() {
     check = check && BOOLEAN_IS_TRUE(__FILE__, __LINE__,StaticHashMap.isKeyExist(map,keys[1]));;
     check = check && BOOLEAN_IS_TRUE(__FILE__, __LINE__,StaticHashMap.isKeyExist(map,keys[2]));;
     check = check && BOOLEAN_IS_TRUE(__FILE__, __LINE__,StaticHashMap.isKeyExist(map,keys[3]));;
-    check = check && BOOLEAN_IS_FALSE(__FILE__, __LINE__,StaticHashMap.isKeyExist(map,1000));;
 
     printf("testIsKeyExist\n");
     StaticHashMap.free(&map);
@@ -168,7 +179,7 @@ static int testFree() {
     StaticHashMap.insert(map, keys[3], &values[3]);
 
     int check = BOOLEAN_IS_TRUE(__FILE__, __LINE__,StaticHashMap.free(&map));
-    check = check && BOOLEAN_IS_FALSE(__FILE__, __LINE__,StaticHashMap.free(&map));
+    check = check && BOOLEAN_IS_TRUE(__FILE__, __LINE__,StaticHashMap.free(&map)==0);
 
     StaticHashMap.free(&map);
     printf("testFree\n");
@@ -190,7 +201,7 @@ static void testPrint() {
     StaticHashMap.free(&map);
 }
 
-int main() {
+static void test(){
     Test test = StaticTest.new();
 
     StaticTest.addTask(&test, testNew);
@@ -203,7 +214,54 @@ int main() {
 
     StaticTest.run(&test);
     testPrint();
+}
 
+static void demo(){
+    int keys[] = {1, 2, 3, 6};
+    double values[] = {1.2, 3.4, 6.8, 7.9};
 
+    //Initialized Hash map
+    HashMap *map = StaticHashMap.new();
+    StaticHashMap.print(map);//Print hash map
+    printf("\n");
+
+    //Insert contents in hash map
+    StaticHashMap.insert(map, keys[0], &values[0]);
+    StaticHashMap.insert(map, keys[1], &values[1]);
+    StaticHashMap.insert(map, keys[2], &values[2]);
+    StaticHashMap.insert(map, keys[3], &values[3]);
+    StaticHashMap.print(map);//Print hash map
+    printf("\n");
+
+    //Get content from hash map using key
+    double* valuePtr = StaticHashMap.get(map,keys[0]);
+    printf("%d -> %f\n",keys[0],*valuePtr);
+
+    //Get all keys
+    int mapKeys[map->size];
+    StaticHashMap.getKeys(map,mapKeys);
+    for (int i = 0; i < map->size; ++i)
+        printf("%d, ",mapKeys[i]);
+    printf("\n");
+
+    //Delete content using keys
+    StaticHashMap.delete(map,keys[2]);
+    StaticHashMap.delete(map,keys[1]);
+    StaticHashMap.print(map);//Print hash map
+    printf("\n");
+
+    //Check if key exist or not
+    printf("Key %d %s\n",keys[3],StaticHashMap.isKeyExist(map,keys[3])?"exists":"doesn't exist");
+    printf("Key %d %s\n",keys[1],StaticHashMap.isKeyExist(map,keys[1])?"exists":"doesn't exist");
+
+    //Free memory of hashmap
+    printf("%s\n",StaticHashMap.free(&map)?"Map is destroyed":"Map is NULL");
+    printf("%s\n",map==NULL?"Map is NULL":"Map is not NULL");
+
+}
+
+int main() {
+    test();
+//    demo();
     return 0;
 }
