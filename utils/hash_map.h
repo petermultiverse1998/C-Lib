@@ -88,6 +88,12 @@ struct HashMapControl {
      * @param map  : Hash map
      */
     void (*print)(HashMap *map);
+
+    /**
+     * This return allocated memory for hash map till now
+     * @return  : Allocated memories
+     */
+    int (*getAllocatedMemories)();
 };
 
 extern struct HashMapControl StaticHashMap;

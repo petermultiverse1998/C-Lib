@@ -31,7 +31,7 @@ static Test new() {
 }
 
 /**
- * This add test task to testing que
+ * This enqueue test task to testing que
  * @param test      : Test struct
  * @param task      : task to be tested
  * @return          : 1 for successfully added (OR) 0 for out of size

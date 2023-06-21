@@ -10,6 +10,8 @@
 #define MAP_SIZE HASH_MAP_SIZE
 #define MAX_LOOP 1000
 
+static int allocatedMemory = 0;
+
 typedef struct HashMapEntry Entry;
 
 /**
@@ -28,8 +30,10 @@ int hashFunc(int key) {
  *                      : NULL if there exist no memory for allocation
  */
 static void *allocateMemory(int sideInByte) {
-//    return NULL;
-    return malloc(sideInByte);
+    void* ptr = malloc(sideInByte);
+    if(ptr!=NULL)
+        allocatedMemory+=sideInByte;
+    return ptr;
 }
 
 /**
@@ -39,10 +43,8 @@ static void *allocateMemory(int sideInByte) {
  * @return              : 1 for success (OR) 0 for failed
  */
 static int freeMemory(void *pointer, int sizeInByte) {
-    (void)sizeInByte;
-//    if(sizeInByte==0)
-//        return 1;
     free(pointer);
+    allocatedMemory-=sizeInByte;
     return 1;
 }
 
@@ -65,6 +67,7 @@ static HashMap *new() {
 
     //Make initial size zero
     map->size = 0;
+
     return map;
 }
 
@@ -132,6 +135,9 @@ static HashMap *insert(HashMap *map, int key, HashMapType value) {
             if (entry->key == key) {
                 //Only update value
                 entry->value = value;
+
+                //Free allocated memory for @newEntry
+                freeMemory(newEntry, sizeof(Entry));
                 return map;
             }
 
@@ -147,7 +153,7 @@ static HashMap *insert(HashMap *map, int key, HashMapType value) {
         //If @MAX_LOOP exceeds then entry is not inserted
         if (l >= MAX_LOOP) {
             //Free allocated memory for @newEntry
-            free(newEntry);
+            freeMemory(newEntry, sizeof(Entry));
             return NULL;
         }
     }
@@ -187,6 +193,7 @@ static HashMapType get(HashMap *map, int key) {
         //If key is not found then go to next entry
         entry = entry->nextEntry;
     }
+
     //If loop exceeds the limit and no key is found then return NULL
     return HASH_MAP_NULL;
 }
@@ -200,6 +207,10 @@ static HashMapType get(HashMap *map, int key) {
  */
 static HashMap *delete(HashMap *map, int key) {
     //If map is NULL return NULL
+    if (map == NULL)
+        return NULL;
+
+    //If map is NULL then return NULL
     if (map == NULL)
         return NULL;
 
@@ -227,6 +238,9 @@ static HashMap *delete(HashMap *map, int key) {
                 // If prevEntry is not NULL then this entry is branch entry
                 prevEntry->nextEntry = nextEntry;
 
+            //Deallocate memory for this entry
+            freeMemory(entry, sizeof(Entry));
+
             //Decrease the size
             map->size--;
             return map;
@@ -236,6 +250,7 @@ static HashMap *delete(HashMap *map, int key) {
         prevEntry = entry;
         entry = entry->nextEntry;
     }
+
     //If key is not found return NULL
     return NULL;
 }
@@ -267,6 +282,7 @@ static HashMap *getKeys(HashMap *map, int keys[]) {
             entry = entry->nextEntry;//Go to next entry
         }
     }
+
     return map;
 }
 
@@ -279,6 +295,10 @@ static HashMap *getKeys(HashMap *map, int keys[]) {
  */
 static int isKeyExist(HashMap *map, int key) {
     //If map is NULL return false
+    if (map == NULL)
+        return 0;
+
+    //If map is NULL then return NULL
     if (map == NULL)
         return 0;
 
@@ -299,6 +319,7 @@ static int isKeyExist(HashMap *map, int key) {
         //If key is not found then go to next entry
         entry = entry->nextEntry;
     }
+
     //If loop exceeds the limit and no key is found then return false
     return 0;
 }
@@ -324,15 +345,25 @@ static int freeMap(HashMap **mapPtr) {
         return 1;
     }
 
-    //If map is not empty
-    int keys[size];
-
-    //Get all keys
-    getKeys(map, keys);
-
     //Delete all entries
-    for (int i = 0; i < size; ++i)
-        delete(map, keys[i]);
+    for (int entryIndex = 0; entryIndex < MAP_SIZE; ++entryIndex) {
+        for (int l = 0; l < MAX_LOOP; ++l) {
+            //If entry is empty then break loop
+            if (map->entries[entryIndex] == NULL)
+                break;
+
+            //If entry is not empty
+            Entry* entry = map->entries[entryIndex];
+
+            // If prevEntry is NULL then this entry is top entry
+            map->entries[entryIndex] = entry->nextEntry;
+
+            //Deallocate memory for this entry
+            freeMemory(entry, sizeof(Entry));
+
+            map->size--;
+        }
+    }
 
     //Free memory for hash map
     freeMemory(map, sizeof(HashMap));
@@ -340,6 +371,14 @@ static int freeMap(HashMap **mapPtr) {
     *mapPtr=NULL;
 
     return 1; //freeing memory success
+}
+
+/**
+ * This return allocated memory for hash map till now
+ * @return  : Allocated memories
+ */
+static int getAllocatedMemories(){
+    return allocatedMemory;
 }
 
 struct HashMapControl StaticHashMap = {
@@ -350,5 +389,6 @@ struct HashMapControl StaticHashMap = {
         .getKeys=getKeys,
         .isKeyExist=isKeyExist,
         .free=freeMap,
-        .print=print
+        .print=print,
+        .getAllocatedMemories = getAllocatedMemories
 };

@@ -19,7 +19,7 @@ struct TestController{
      */
     Test (*new)();
     /**
-     * This add testing task to testing que
+     * This enqueue testing task to testing que
      * @param test      : Test struct
      * @param task      : task to be tested
      * @return          : 1 for successfully added (OR) 0 for out of size
