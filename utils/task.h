@@ -1,58 +1,63 @@
 //
-// Created by peter on 6/18/2023.
+// Created by peter on 6/21/2023.
 //
 
-#ifndef C_LIB_QUEUE_H
-#define C_LIB_QUEUE_H
+#ifndef C_LIB_TASK_H
+#define C_LIB_TASK_H
 
+#define TASK_NULL NULL
 
-#define QueueType void*
-#define QUEUE_NULL NULL
+typedef enum {
+    TASK_SUCCESS = 1,
+    TASK_BUSY = 0
+}TaskStatus;
 
-struct QueueData {
-    QueueType value;
-    struct QueueData *next;
+typedef int (*Task)();
+
+struct TaskQueueData {
+    Task task;
+    struct TaskQueueData *next;
 };
 typedef struct {
-    void (*printEachElement)(QueueType value);
+    void (*printEachElement)(Task value);
     int size;
-    struct QueueData *front;
-    struct QueueData *back;
-} Queue;
+    struct TaskQueueData *front;
+    struct TaskQueueData *back;
+} TaskQueue;
 
-struct QueueControl {
+struct TaskQueControl {
     /**
      * Computation Cost : O(1)\n
-     * It allocates the memory for queue and return allocated Queue
+     * It allocates the memory for queue and return allocated TaskQueue
      * @printEachElementFunc : Call back function called for each data when print is called
-     * @return : Allocated Queue (!!! Must be free using free) (OR) NULL if heap is full
+     * @return : Allocated TaskQueue (!!! Must be free using free) (OR) NULL if heap is full
      */
-    Queue *(*new)(void (*printEachElementFunc)(QueueType value));
+    TaskQueue *(*new)(void (*printEachElementFunc)(Task value));
 
     /**
      * Computation Cost : O(1)\n
      * It adds the element to the end of the queue
-     * @param queue     : Queue
+     * @param queue     : TaskQueue
      * @param value     : Value to be added in queue
      * @return          : Same que (OR) NULL if heap is full or queue is null
      */
-    Queue *(*enqueue)(Queue *queue, QueueType value);
+    TaskQueue *(*enqueue)(TaskQueue *queue, Task value);
 
     /**
      * Computation Cost : O(1)\n
      * It remove the element from the front of the queue and return it
-     * @param queue     : Queue
+     * @param queue     : TaskQueue
      * @return          : Element in front (OR) QUE_NULL if queue is empty or queue is null
      */
-    QueueType (*dequeue)(Queue *queue);
+    Task (*dequeue)(TaskQueue *queue);
 
     /**
      * Computation Cost : O(1)\n
      * It returns the element from the front of the queue without removing it
-     * @param queue     : Queue
+     * @param queue     : TaskQueue
      * @return          : Element in front (OR) QUE_NULL if queue is empty or queue is null
      */
-    QueueType(*peek)(Queue *queue);
+    Task(*peek)(TaskQueue *queue);
 
     /**
      * Computation Cost : O(n)\n
@@ -60,21 +65,27 @@ struct QueueControl {
      * @param queuePtr  : Address of pointer to queue
      * @return          : 1 for success (OR) 0 for failed
      */
-    int (*free)(Queue **queuePtr);
+    int (*free)(TaskQueue **queuePtr);
 
     /**
      * This will print the contents of que
-     * @param queue : Queue to be printed
+     * @param queue : TaskQueue to be printed
      */
-    void (*print)(Queue *queue);
+    void (*print)(TaskQueue *queue);
+
+    /**
+     * This should be called regularly. It handles all the tasks and run it.
+     * @param queue     : TaskQue
+     */
+    void (*execute)(TaskQueue *queue);
 
     /**
      * This return allocated memory for queue till now
      * @return  : Allocated memories
      */
     int (*getAllocatedMemories)();
+
 };
 
-extern struct QueueControl StaticQueue;
-
-#endif //C_LIB_QUEUE_H
+extern struct TaskQueControl StaticTaskQueue;
+#endif //C_LIB_TASK_H

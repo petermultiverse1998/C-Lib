@@ -16,6 +16,7 @@ static int testNew() {
 
     printf("testNew\n");
     StaticQueue.free(&queue);
+    check = check && INT_EQUALS(__FILE__, __LINE__,0,StaticQueue.getAllocatedMemories());
     return check;
 }
 
@@ -39,6 +40,7 @@ static int testEnqueue() {
 
     printf("testEnqueue\n");
     StaticQueue.free(&queue);
+    check = check && INT_EQUALS(__FILE__, __LINE__,0,StaticQueue.getAllocatedMemories());
     return check;
 }
 
@@ -65,6 +67,7 @@ static int testDequeue() {
 
     printf("testDequeue\n");
     StaticQueue.free(&queue);
+    check = check && INT_EQUALS(__FILE__, __LINE__,0,StaticQueue.getAllocatedMemories());
     return check;
 }
 
@@ -92,6 +95,7 @@ static int testPeek() {
 
     printf("testPeek\n");
     StaticQueue.free(&queue);
+    check = check && INT_EQUALS(__FILE__, __LINE__,0,StaticQueue.getAllocatedMemories());
     return check;
 }
 
@@ -108,6 +112,8 @@ static int testFree() {
     check = check && BOOLEAN_IS_TRUE(__FILE__,__LINE__,StaticQueue.free(&queue)==0);
     check = check && BOOLEAN_IS_TRUE(__FILE__,__LINE__,queue==NULL);
 
+    check = check && INT_EQUALS(__FILE__, __LINE__,0,StaticQueue.getAllocatedMemories());
+
     printf("testFree\n");
     return check;
 }
@@ -119,6 +125,7 @@ static void test(){
     StaticTest.addTask(&test, testEnqueue);
     StaticTest.addTask(&test, testDequeue);
     StaticTest.addTask(&test, testPeek);
+    StaticTest.addTask(&test, testFree);
 
     StaticTest.run(&test);
 }
