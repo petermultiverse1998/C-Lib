@@ -3,6 +3,8 @@
 //
 
 #include <stdio.h>
+#include <unistd.h>
+#include <pthread.h>
 #include "hash_map.h"
 #include "sys/time.h"
 #include "../test/test.h"
@@ -24,6 +26,7 @@ static int testNew() {
 
     printf("testNew\n");
     StaticHashMap.free(&map);
+    check = check && INT_EQUALS(__FILE__, __LINE__,0,StaticHashMap.getAllocatedMemories());
     return check;
 }
 
@@ -61,6 +64,7 @@ static int testInsert() {
 
     printf("testInsert\n");
     StaticHashMap.free(&map);
+    check = check && INT_EQUALS(__FILE__, __LINE__,0,StaticHashMap.getAllocatedMemories());
     return check;
 }
 
@@ -82,6 +86,7 @@ static int testGet() {
 
     printf("testGet\n");
     StaticHashMap.free(&map);
+    check = check && INT_EQUALS(__FILE__, __LINE__,0,StaticHashMap.getAllocatedMemories());
     return check;
 }
 
@@ -111,6 +116,7 @@ static int testDelete() {
 
     printf("testDelete\n");
     StaticHashMap.free(&map);
+    check = check && INT_EQUALS(__FILE__, __LINE__,0,StaticHashMap.getAllocatedMemories());
     return check;
 }
 
@@ -143,6 +149,7 @@ static int testGetKeys() {
 
     printf("testGetKeys\n");
     StaticHashMap.free(&map);
+    check = check && INT_EQUALS(__FILE__, __LINE__,0,StaticHashMap.getAllocatedMemories());
     return check;
 }
 
@@ -156,8 +163,6 @@ static int testIsKeyExist() {
     StaticHashMap.insert(map, keys[2], &values[2]);
     StaticHashMap.insert(map, keys[3], &values[3]);
 
-    int mapKeys[4];
-
     int check = BOOLEAN_IS_TRUE(__FILE__, __LINE__,StaticHashMap.isKeyExist(map,keys[0]));
     check = check && BOOLEAN_IS_TRUE(__FILE__, __LINE__,StaticHashMap.isKeyExist(map,keys[1]));;
     check = check && BOOLEAN_IS_TRUE(__FILE__, __LINE__,StaticHashMap.isKeyExist(map,keys[2]));;
@@ -165,6 +170,7 @@ static int testIsKeyExist() {
 
     printf("testIsKeyExist\n");
     StaticHashMap.free(&map);
+    check = check && INT_EQUALS(__FILE__, __LINE__,0,StaticHashMap.getAllocatedMemories());
     return check;
 }
 
@@ -183,8 +189,10 @@ static int testFree() {
 
     StaticHashMap.free(&map);
     printf("testFree\n");
+    check = check && INT_EQUALS(__FILE__, __LINE__,0,StaticHashMap.getAllocatedMemories());
     return check;
 }
+
 
 static void testPrint() {
     int keys[] = {1, 2, 3, 13};
@@ -199,6 +207,7 @@ static void testPrint() {
     StaticHashMap.print(map);
 
     StaticHashMap.free(&map);
+
 }
 
 static void test(){

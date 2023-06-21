@@ -14,8 +14,12 @@ add_executable(
         utils/queue.c
         utils/queue.h
 
+        utils/task.c
+        utils/task.h
+
         #        test/test_test.c
         #        utils/hash_map_test.c
         #        utils/queue_test.c
+        #        utils/task_test.c
         main.c
 )
