@@ -10,16 +10,27 @@ add_executable(
 
         utils/hash_map.c
         utils/hash_map.h
-
         utils/queue.c
         utils/queue.h
-
         utils/task.c
         utils/task.h
 
+        controls/lpf.c
+        controls/lpf.h
+        controls/hpf.c
+        controls/hpf.h
+        controls/pid.c
+        controls/pid.h
+
         #        test/test_test.c
+
         #        utils/hash_map_test.c
         #        utils/queue_test.c
         #        utils/task_test.c
-        main.c
+
+#        controls/lpf_test.c
+#        controls/hpf_test.c
+        controls/pid_test.c
+
+        #        main.c
 )

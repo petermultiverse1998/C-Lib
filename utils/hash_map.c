@@ -25,14 +25,14 @@ int hashFunc(int key) {
 
 /**
  * It allocates the memory and return pointer to it
- * @param sideInByte    : Size in bytes
+ * @param sizeInByte    : Size in bytes
  * @return              : Pointer to allocated memory
  *                      : NULL if there exist no memory for allocation
  */
-static void *allocateMemory(int sideInByte) {
-    void* ptr = malloc(sideInByte);
+static void *allocateMemory(int sizeInByte) {
+    void* ptr = malloc(sizeInByte);
     if(ptr!=NULL)
-        allocatedMemory+=sideInByte;
+        allocatedMemory+=sizeInByte;
     return ptr;
 }
 
