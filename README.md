@@ -9,4 +9,6 @@ These are some of necessary library for C programming specially embedded program
 
 ## Controls
 1. [LPF](https://petermultiverse.super.site/2a44b77743254ea7ae9cd959781ca802): Low Pass Filter for control system
+2. [HPF](https://petermultiverse.super.site/e5d07a349ec741dbbea533f7c5aa0c44): High Pass Filter for control system
+3. [PID](https://petermultiverse.super.site/c44b968c9587447cae1071b4676ca5b0): PID for control system
 
