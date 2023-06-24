@@ -128,12 +128,17 @@ static void demo() {
 //        x[i][0] = (i%20<10)?((float)(i%10)/10.0f):1-((float)(i%10)/10.0f);//Triangular Wave
 //        x[i][0] = (float)(i%21)/20.0f;//Sawtooth Wave
         x[i][0] = sinf(0.5f*2.0f*(float)M_PI*dt*(float)i);//Sine Wave
-
     }
 
-    PID *pid = StaticPID.new(dt, size, 1,1,1);
+
+    PID *pid = StaticPID.new(dt, size, 0.001f,20,0);
+
+
+    float y_ref[1],error[1];
     for (int i = 0; i < N; ++i) {
-        StaticPID.process(pid,x[i]);
+        y_ref[0] = x[i][0];
+        error[0] = y_ref[0]-pid->y[0];
+        StaticPID.process(pid,error);
         y[i][0] = pid->y[0];
     }
 

@@ -109,7 +109,7 @@ static void print(PID* pid){
         printf("PID: NULL\n");
     float Kd = pid->dt*pid->c;
     float Kp = -(pid->b+2*Kd/pid->dt);
-    float Ki = (pid->a-Kp-Kd/pid->dt)*pid->dt;
+    float Ki = (pid->a-Kp-Kd/pid->dt)/pid->dt;
 
     printf("PID: dt = %f, size = %d, Kp = %f, Ki = %f, Kd = %f\n",pid->dt,pid->size,Kp,Ki,Kd);
 }
