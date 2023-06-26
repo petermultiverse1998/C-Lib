@@ -28,9 +28,9 @@ add_executable(
         #        utils/queue_test.c
         #        utils/task_test.c
 
-#        controls/lpf_test.c
-#        controls/hpf_test.c
-        controls/pid_test.c
+        #        controls/lpf_test.c
+        #        controls/hpf_test.c
+        #        controls/pid_test.c
 
-        #        main.c
+        main.c
 )

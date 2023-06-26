@@ -9,9 +9,11 @@ typedef struct{
     float dt;
     int size;
 
-    float a;
-    float b;
-    float c;
+    float Kp;
+    float Ki;
+    float Kd;
+    float min;
+    float max;
 
     float *x_prev;
     float *x;
@@ -26,9 +28,11 @@ struct PIDControl{
      * @param Kp    : Proportional Constant
      * @param Ki    : Integrator Constant
      * @param Kd    : Derivative Constant
+     * @param min   : Minimum Output
+     * @param max   : Maximum Output
      * @return      : PID pointer
      */
-    PID* (*new)(float dt,int size,float Kp,float Ki,float Kd);
+    PID* (*new)(float dt,int size,float Kp,float Ki,float Kd,float min,float max);
 
     /**
      * This will process and should be called in each step

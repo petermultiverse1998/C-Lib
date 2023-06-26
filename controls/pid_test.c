@@ -14,21 +14,22 @@ static int testNew() {
     float Kp = 1;
     float Ki = 1;
     float Kd = 1;
-
-    float a = Kp+Ki*dt+Kd/dt;
-    float b = -Kp-2*Kd/dt;
-    float c = Kd/dt;
+    float min = -1000;
+    float max = 1000;
 
 
-    PID *pid = StaticPID.new(dt, size, Kp,Ki,Kd);
+
+    PID *pid = StaticPID.new(dt, size, Kp,Ki,Kd,min,max);
 
     int check = BOOLEAN_IS_TRUE(__FILE__, __LINE__, NULL != pid);
 
     check = check && FLOAT_EQUALS(__FILE__, __LINE__, dt, pid->dt);
     check = check && INT_EQUALS(__FILE__, __LINE__, size, pid->size);
-    check = check && FLOAT_EQUALS(__FILE__, __LINE__, a, pid->a);
-    check = check && FLOAT_EQUALS(__FILE__, __LINE__, b, pid->b);
-    check = check && FLOAT_EQUALS(__FILE__, __LINE__, c, pid->c);
+    check = check && FLOAT_EQUALS(__FILE__, __LINE__, Kp, pid->Kp);
+    check = check && FLOAT_EQUALS(__FILE__, __LINE__, Ki, pid->Ki);
+    check = check && FLOAT_EQUALS(__FILE__, __LINE__, Kd, pid->Kd);
+    check = check && FLOAT_EQUALS(__FILE__, __LINE__, min, pid->min);
+    check = check && FLOAT_EQUALS(__FILE__, __LINE__, max, pid->max);
     check = check && BOOLEAN_IS_TRUE(__FILE__, __LINE__, NULL != pid->x_prev);
     check = check && BOOLEAN_IS_TRUE(__FILE__, __LINE__, NULL != pid->x);
     check = check && BOOLEAN_IS_TRUE(__FILE__, __LINE__, NULL != pid->y);
@@ -46,13 +47,16 @@ static int testProcess() {
     float Kp = 1;
     float Ki = 1;
     float Kd = 1;
+    float min = -1000;
+    float max = 1000;
+
 
     float a = Kp+Ki*dt+Kd/dt;
     float b = -Kp-2*Kd/dt;
     float c = Kd/dt;
 
 
-    PID *pid = StaticPID.new(dt, size, Kp,Ki,Kd);
+    PID *pid = StaticPID.new(dt, size, Kp,Ki,Kd,min,max);
 
     float x[] = {1};
     float y[size];
@@ -80,8 +84,11 @@ static int testFree() {
     float Kp = 1;
     float Ki = 1;
     float Kd = 1;
+    float min = -1000;
+    float max = 1000;
 
-    PID *pid = StaticPID.new(dt, size, Kp,Ki,Kd);
+
+    PID *pid = StaticPID.new(dt, size, Kp,Ki,Kd,min,max);
 
     StaticPID.free(&pid);
     int check = BOOLEAN_IS_TRUE(__FILE__, __LINE__, NULL == pid);
@@ -131,7 +138,7 @@ static void demo() {
     }
 
 
-    PID *pid = StaticPID.new(dt, size, 0.001f,20,0);
+    PID *pid = StaticPID.new(dt, size, 0.001f,20,0,-1000,1000);
 
 
     float y_ref[1],error[1];
@@ -153,8 +160,8 @@ static void demo() {
 }
 
 int main() {
-//    test();
-    demo();
+    test();
+//    demo();
 
     return 0;
 }

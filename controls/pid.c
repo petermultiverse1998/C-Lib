@@ -40,21 +40,21 @@ static int freeMemory(void *pointer, int sizeInByte) {
  * @param Kp    : Proportional Constant
  * @param Ki    : Integrator Constant
  * @param Kd    : Derivative Constant
+ * @param min   : Minimum Output
+ * @param max   : Maximum Output
  * @return      : PID pointer
  */
-static PID* new(float dt,int size,float Kp,float Ki,float Kd){
-    float a = Kp+Ki*dt+Kd/dt;
-    float b = -Kp-2*Kd/dt;
-    float c = Kd/dt;
-
+static PID* new(float dt,int size,float Kp,float Ki,float Kd,float min,float max){
     PID *pid = allocateMemory(sizeof(PID));
 
     pid->dt = dt;
     pid->size = size;
 
-    pid->a = a;
-    pid->b = b;
-    pid->c = c;
+    pid->Kp = Kp;
+    pid->Ki = Ki;
+    pid->Kd = Kd;
+    pid->min = min;
+    pid->max = max;
 
     pid->x_prev = allocateMemory(size);
     pid->x = allocateMemory(size);
@@ -81,17 +81,32 @@ static PID* process(PID* pid, const float* xs){
         return NULL;
 
     float y,x,x_prev;
+    float dt = pid->dt;
     int size = pid->size;
 
-    float a = pid->a;
-    float b = pid->b;
-    float c = pid->c;
+    float Kp=pid->Kp;
+    float Ki=pid->Ki;
+    float Kd=pid->Kd;
+    float min = pid->min;
+    float max = pid->max;
+
+    float a =Kp+Ki*dt+Kd/dt;
+    float b = -Kp-2*Kd/dt;
+    float c = Kd/dt;
     for (int i = 0; i < size; ++i) {
         y = pid->y[i];
         x = pid->x[i];
         x_prev = pid->x_prev[i];
 
-        y = y + a*xs[i]+b*x+c*x_prev;
+        if(y<=min||y>=max)
+            y = y + (a-Ki*dt)*xs[i]+b*x+c*x_prev;
+        else
+            y = y + a*xs[i]+b*x+c*x_prev;
+
+        if(y<min)
+            y=min;
+        else if(y>max)
+            y=max;
 
         pid->x_prev[i] = pid->x[i];
         pid->x[i] = xs[i];
@@ -107,11 +122,7 @@ static PID* process(PID* pid, const float* xs){
 static void print(PID* pid){
     if(pid==NULL)
         printf("PID: NULL\n");
-    float Kd = pid->dt*pid->c;
-    float Kp = -(pid->b+2*Kd/pid->dt);
-    float Ki = (pid->a-Kp-Kd/pid->dt)/pid->dt;
-
-    printf("PID: dt = %f, size = %d, Kp = %f, Ki = %f, Kd = %f\n",pid->dt,pid->size,Kp,Ki,Kd);
+    printf("PID: dt = %f, size = %d, Kp = %f, Ki = %f, Kd = %f\n",pid->dt,pid->size,pid->Kp,pid->Ki,pid->Kd);
 }
 
 /**
