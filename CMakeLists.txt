@@ -25,12 +25,12 @@ add_executable(
         #        test/test_test.c
 
         #        utils/hash_map_test.c
-        #        utils/queue_test.c
+                utils/queue_test.c
         #        utils/task_test.c
 
         #        controls/lpf_test.c
         #        controls/hpf_test.c
         #        controls/pid_test.c
 
-        main.c
+#        main.c
 )
