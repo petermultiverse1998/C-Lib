@@ -5,6 +5,7 @@
 #include "lpf.h"
 #include <malloc.h>
 #include <stdio.h>
+#include <math.h>
 
 static int allocatedMemory = 0;
 
@@ -77,7 +78,8 @@ static LPF *process(LPF *lpf, const float *xs) {
     for (int i = 0; i < size; ++i) {
         y = lpf->y[i];
 
-        y = (y + dt * xs[i] / tau) / (1 + dt / tau);
+        y = (y + dt * xs[i] / tau) / (1 + dt / tau);//Difference form
+//        y = expf(-dt/tau)*(y-xs[i])+xs[i];//Exponential form
 
         lpf->y[i] = y;
         lpf->x[i] = xs[i];

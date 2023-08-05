@@ -91,7 +91,7 @@ static void copyToClipboard(const char* output){
 }
 
 static void demo() {
-    float dt = 0.05f;
+    float dt = 0.5f;
     float T = 10.0f;
     int N = (int)(T/dt);
     int size = 1;
@@ -99,11 +99,13 @@ static void demo() {
     float x[N][size],y[N][size];
     for (int i = 0; i < N; ++i) {
 //        x[i][0] = 1;//Step
+//        x[i][0] = (float)i/(float)N;//Ramp
+        x[i][0] = 1.0f-expf(-(float)i/(float)(N/5));//Exp
 //        x[i][0] = (i>=0 && i<=10)?1:0;//Pulse
 //        x[i][0] = (i%20<10)?1:0;//Square Wave
 //        x[i][0] = (i%20<10)?((float)(i%10)/10.0f):1-((float)(i%10)/10.0f);//Triangular Wave
 //        x[i][0] = (float)(i%21)/20.0f;//Sawtooth Wave
-        x[i][0] = sinf(0.5f*2.0f*(float)M_PI*dt*(float)i);//Sine Wave
+//        x[i][0] = sinf(0.5f*2.0f*(float)M_PI*dt*(float)i);//Sine Wave
 
     }
 
@@ -116,7 +118,7 @@ static void demo() {
     char str[N*10];
     int ptr = 0;
     for (int i = 0; i < N; ++i)
-        ptr+=sprintf(str+ptr, "%f \n",x[i][0]);
+        ptr+=sprintf(str+ptr, "%f \n",y[i][0]);
     copyToClipboard(str);
 
     StaticHPF.print(hpf);

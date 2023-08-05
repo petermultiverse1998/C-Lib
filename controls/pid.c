@@ -4,6 +4,7 @@
 
 #include <malloc.h>
 #include <stdio.h>
+#include <math.h>
 #include "pid.h"
 
 static int allocatedMemory = 0;
@@ -98,6 +99,7 @@ static PID* process(PID* pid, const float* xs){
         x = pid->x[i];
         x_prev = pid->x_prev[i];
 
+        //Difference
         if(y<=min||y>=max)
             y = y + (a-Ki*dt)*xs[i]+b*x+c*x_prev;
         else
@@ -107,6 +109,7 @@ static PID* process(PID* pid, const float* xs){
             y=min;
         else if(y>max)
             y=max;
+
 
         pid->x_prev[i] = pid->x[i];
         pid->x[i] = xs[i];

@@ -5,6 +5,7 @@
 #include "hpf.h"
 #include <malloc.h>
 #include <stdio.h>
+#include <math.h>
 
 static int allocatedMemory = 0;
 
@@ -69,7 +70,7 @@ static HPF *process(HPF *hpf, const float *xs) {
     if (xs == NULL)
         return NULL;
 
-    float y,x;
+    float y,x,q;
     float dt = hpf->dt;
     int size = hpf->size;
 
@@ -78,7 +79,11 @@ static HPF *process(HPF *hpf, const float *xs) {
         y = hpf->y[i];
         x = hpf->x[i];
 
-        y = (y + xs[i] - x) / (1 + dt / tau);
+        y = (y + xs[i] - x) / (1 + dt / tau);//Difference form
+
+        //Exponential form
+//        q = (xs[i]-x)/dt;
+//        y = expf(-dt/tau)*(y-q)+q;
 
         hpf->y[i] = y;
         hpf->x[i] = xs[i];
