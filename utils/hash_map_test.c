@@ -4,7 +4,6 @@
 
 #include <stdio.h>
 #include <unistd.h>
-#include <pthread.h>
 #include "hash_map.h"
 #include "sys/time.h"
 #include "../test/test.h"

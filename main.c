@@ -1,4 +1,7 @@
 #include <stdio.h>
+#include "test/test.h"
+
+#define varToStr(var) #var
 
 void synchronise(){
     //Make function busy
@@ -14,6 +17,9 @@ void synchronise(){
 
 
 int main() {
+    int x = 2;
+//    RED;
+
 
     return 0;
 }
