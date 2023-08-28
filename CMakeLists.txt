@@ -22,9 +22,9 @@ add_executable(
         controls/pid.c
         controls/pid.h
 
-        #        test/test_test.c
+#                test/test_test.c
 
-        #        utils/hash_map_test.c
+#                utils/hash_map_test.c
 #                utils/queue_test.c
         #        utils/task_test.c
 
@@ -32,5 +32,5 @@ add_executable(
 #                controls/hpf_test.c
 #                controls/pid_test.c
 
-#        main.c
+        main.c
 )
