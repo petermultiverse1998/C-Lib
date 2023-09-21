@@ -12,6 +12,6 @@ These are some of necessary library for C programming specially embedded program
 2. [HPF](https://petermultiverse.super.site/e5d07a349ec741dbbea533f7c5aa0c44): High Pass Filter for control system
 3. [PID](https://petermultiverse.super.site/c44b968c9587447cae1071b4676ca5b0): PID for control system
 
-## Controls
+## Signals
 1. [FFT](https://petermultiverse.super.site/e4ca87f6fe014d98a0ec48004f2ed7f7): Fast Fourier Transform and inverse of it for signals
 
