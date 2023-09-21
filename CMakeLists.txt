@@ -22,15 +22,20 @@ add_executable(
         controls/pid.c
         controls/pid.h
 
+        signal/fft.c
+        signal/fft.h
+
 #                test/test_test.c
 
 #                utils/hash_map_test.c
 #                utils/queue_test.c
-        #        utils/task_test.c
+#                utils/task_test.c
 
 #                controls/lpf_test.c
 #                controls/hpf_test.c
 #                controls/pid_test.c
 
-        main.c
+        signal/fft_test.c
+
+#        main.c
 )
