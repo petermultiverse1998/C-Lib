@@ -14,6 +14,8 @@ add_executable(
         utils/queue.h
         utils/task.c
         utils/task.h
+        utils/static_heap.c
+        utils/static_heap.h
 
         controls/lpf.c
         controls/lpf.h
@@ -30,12 +32,13 @@ add_executable(
 #                utils/hash_map_test.c
 #                utils/queue_test.c
 #                utils/task_test.c
+        utils/static_heap_test.c
 
 #                controls/lpf_test.c
 #                controls/hpf_test.c
 #                controls/pid_test.c
 
-        signal/fft_test.c
+        #        signal/fft_test.c
 
 #        main.c
 )
