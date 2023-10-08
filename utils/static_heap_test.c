@@ -1,5 +1,5 @@
 //
-// Created by peter on 9/23/2023.
+// Created by niruja on 9/23/2023.
 //
 #include <stdio.h>
 #include "static_heap.h"

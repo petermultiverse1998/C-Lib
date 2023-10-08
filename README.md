@@ -7,6 +7,7 @@ These are some necessary library for C programming specially embedded programmin
 2. [Queue](https://petermultiverse.super.site/973bc922b35a4a588255482ca56eedeb): Queue in C
 3. [TaskQueue](https://petermultiverse.super.site/97c76d02381444ad916a0bdd324fc00b): TaskQueue for asynchronous execution of multiple tasks
 4. [StaticHeap](https://petermultiverse.super.site/535737d0b73d493d9d4f25bbea51f7e5) : Using this library static memory can be defined and use as dynamic memory instead of using heap in C
+4. [BuddyHeap](https://petermultiverse.super.site/d613f970b8b44e7a9f1cc7fdec8447bf) : Using this library static memory can be defined and use as dynamic memory using buddy allocation instead of using heap in C
 
 ## Controls
 1. [LPF](https://petermultiverse.super.site/2a44b77743254ea7ae9cd959781ca802): Low Pass Filter for control system
