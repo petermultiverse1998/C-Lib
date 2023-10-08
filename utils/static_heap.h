@@ -1,5 +1,5 @@
 //
-// Created by peter on 9/23/2023.
+// Created by niruja on 9/23/2023.
 //
 
 #ifndef C_LIB_STATIC_HEAP_H

@@ -16,6 +16,8 @@ add_executable(
         utils/task.h
         utils/static_heap.c
         utils/static_heap.h
+        utils/buddy_heap.c
+        utils/buddy_heap.h
 
         controls/lpf.c
         controls/lpf.h
@@ -32,7 +34,8 @@ add_executable(
 #                utils/hash_map_test.c
 #                utils/queue_test.c
 #                utils/task_test.c
-        utils/static_heap_test.c
+#        utils/static_heap_test.c
+        utils/buddy_heap_test.c
 
 #                controls/lpf_test.c
 #                controls/hpf_test.c
