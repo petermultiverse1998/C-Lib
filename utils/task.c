@@ -5,6 +5,7 @@
 #include "task.h"
 
 #include <malloc.h>
+#include <stdio.h>
 
 static int allocatedMemory = 0;
 
@@ -12,42 +13,90 @@ typedef struct TaskQueueData TaskQueueData;
 
 /**
  * It allocates the memory and return pointer to it
- * @param sideInByte    : Size in bytes
+ * @param heap          : Pointer to static heap
+ *                      : NULL for dynamic heap
+ * @param sizeInByte    : Size in bytes
  * @return              : Pointer to allocated memory
  *                      : NULL if there exist no memory for allocation
  */
-static void *allocateMemory(int sideInByte) {
-    void *ptr = malloc(sideInByte);
+static void *allocateMemory(BuddyHeap *heap,int sizeInByte) {
+    if(sizeInByte<=0)
+        return NULL;
+    void *ptr;
+    ptr = heap != NULL ? StaticBuddyHeap.malloc(heap, sizeInByte) : malloc(sizeInByte);
     if (ptr != NULL)
-        allocatedMemory += sideInByte;
+        allocatedMemory += sizeInByte;
     return ptr;
 }
 
 /**
  * It free the allocated memory
+ * @param heap          : Pointer to static heap
+ *                      : NULL for dynamic heap
  * @param pointer       : Pointer to allocated Memory
  * @param sizeInByte    : Size to be freed
  * @return              : 1 for success (OR) 0 for failed
  */
-static int freeMemory(void *pointer, int sizeInByte) {
-    free(pointer);
+static int freeMemory(BuddyHeap *heap,void *pointer, int sizeInByte) {
+    if(pointer==NULL || sizeInByte<=0)
+        return 0;
+    heap != NULL ? StaticBuddyHeap.free(heap, pointer) : free(pointer);
     allocatedMemory -= sizeInByte;
+    return 1;
+}
+
+/**
+ * Check if memory pointer exist in defined memory
+ */
+static int validMemory(const char *func, BuddyHeap *heap, void *ptr) {
+    if (ptr == NULL)
+        return 1;
+    uint64_t addr = (uint64_t) ptr;
+    if (heap == NULL) {
+
+        return 1;
+
+        if (addr < 0x20000000 || addr > 0x20004fff) {
+            printf("HashMap-%s:\n", func);
+            printf("Memory : 0x20000000 - 0x20004fff\n");
+            printf("Ptr : %p\n\n", ptr);
+//			*(uint8_t*)NULL = 10;
+            return 0;
+        }
+    } else {
+        if (!StaticBuddyHeap.isValidPointer(*heap, ptr)) {
+            printf("HashMap-%s:\n", func);
+            printf("Heap : %p\n", heap);
+            printf("Memory : %p - %p\n", heap->memory, heap->memory + heap->maxSize);
+            printf("Ptr : %p\n\n", ptr);
+//			*(uint8_t*) NULL = 10;
+            return 0;
+        }
+
+    }
     return 1;
 }
 
 /**
  * Computation Cost : O(1)\n
  * It allocates the memory for queue and return allocated TaskQueue
- * @printEachElementFunc : Call back function called for each data when print is called
- * @return : Allocated TaskQueue (!!! Must be free using free) (OR) NULL if heap is full
+ * @printEachElementFunc    : Call back function called for each data when print is called
+ * @param heap              : Pointer to static heap
+ *                          : NULL for dynamic heap
+ * @return                  : Allocated TaskQueue (!!! Must be free using free) (OR) NULL if heap is full
  */
-static TaskQueue *new(void (*printEachElementFunc)(Task task)) {
+static TaskQueue *new(BuddyHeap *heap,void (*printEachElementFunc)(Task task)) {
     //Allocate memory for hash map
-    TaskQueue *queue = allocateMemory(sizeof(TaskQueue));
+    TaskQueue *queue = allocateMemory(heap,sizeof(TaskQueue));
+
+    //Invalid memory
+    if (!validMemory(__func__, heap, queue))
+        return NULL;
 
     //Heap is full
     if (queue == NULL)
         return NULL;
+    queue->heap = heap;
 
     queue->printEachElement = printEachElementFunc;
 
@@ -73,7 +122,11 @@ static TaskQueue *enqueue(TaskQueue *queue, Task task) {
         return NULL;
 
     //Allocate Memory for newData
-    TaskQueueData *newData = allocateMemory(sizeof(TaskQueueData));
+    TaskQueueData *newData = allocateMemory(queue->heap,sizeof(TaskQueueData));
+
+    //If newData is invalid pointer return NULL
+    if (!validMemory(__func__, queue->heap, newData))
+        return NULL;
 
     //If heap is full then return NULL
     if (newData == NULL)
@@ -123,7 +176,7 @@ static Task dequeue(TaskQueue *queue) {
         queue->front = frontData->next;
 
         //Deallocate the allocated memory by front data
-        freeMemory(frontData, sizeof(TaskQueueData));
+        freeMemory(queue->heap,frontData, sizeof(TaskQueueData));
 
         //Decrease the size of queue
         queue->size--;
@@ -171,7 +224,7 @@ static int freeQue(TaskQueue **queuePtr) {
     //If queue is empty
     if (size == 0) {
         //Free hash map memory
-        freeMemory(queue, sizeof(TaskQueue));
+        freeMemory(queue->heap,queue, sizeof(TaskQueue));
         *queuePtr = NULL;
         return 1;
     }
@@ -181,7 +234,7 @@ static int freeQue(TaskQueue **queuePtr) {
         dequeue(queue);
 
     //Free memory for queue
-    freeMemory(queue, sizeof(TaskQueue));
+    freeMemory(queue->heap,queue, sizeof(TaskQueue));
 
     *queuePtr = NULL;
 

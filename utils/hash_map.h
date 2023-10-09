@@ -5,6 +5,8 @@
 #ifndef C_LIB_HASH_MAP_H
 #define C_LIB_HASH_MAP_H
 
+#include "buddy_heap.h"
+
 #define HASH_MAP_SIZE 3
 #define HashMapType void*
 #define HASH_MAP_NULL NULL
@@ -18,6 +20,7 @@ struct HashMapEntry {
 struct HashMap {
     int size;
     struct HashMapEntry *entries[HASH_MAP_SIZE];
+    BuddyHeap *heap;
 };
 typedef struct HashMap HashMap;
 
@@ -27,11 +30,13 @@ struct HashMapControl {
      * It allocates the memory for HashMap and return allocated HashMap
      * @return : Allocated HashMap (!!! Must be free using free ) (OR) NULL if heap is full
      */
-    HashMap *(*new)();
+    HashMap *(*new)(BuddyHeap *heap);
 
     /**
      * Computation Cost : O(1)\n
      * It inserts the value in map
+     * @param heap  : Pointer to static heap
+     *              : NULL for dynamic heap
      * @param map   : HashMap
      * @param key   : Key for value
      * @param value : Value to be inserted of type HashMapType

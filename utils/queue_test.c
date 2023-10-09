@@ -8,7 +8,7 @@
 #include "../test/test.h"
 
 static int testNew() {
-    Queue *queue = StaticQueue.new(NULL);
+    Queue *queue = StaticQueue.new(NULL,NULL);
     int check = BOOLEAN_IS_TRUE(__FILE__, __LINE__, NULL != queue);
     check = check && BOOLEAN_IS_TRUE(__FILE__, __LINE__, queue->front == NULL);
     check = check && BOOLEAN_IS_TRUE(__FILE__, __LINE__, queue->back == NULL);
@@ -23,7 +23,7 @@ static int testNew() {
 static int testEnqueue() {
     double values[] = {1.2, 3.4, 6.8, 7.9};
 
-    Queue *queue = StaticQueue.new(NULL);
+    Queue *queue = StaticQueue.new(NULL,NULL);
     int check = BOOLEAN_IS_TRUE(__FILE__,__LINE__,StaticQueue.enqueue(queue,&values[0])!=NULL);
     check = check && BOOLEAN_IS_TRUE(__FILE__,__LINE__,StaticQueue.enqueue(queue,&values[1])!=NULL);
     check = check && BOOLEAN_IS_TRUE(__FILE__,__LINE__,StaticQueue.enqueue(queue,&values[2])!=NULL);
@@ -47,7 +47,7 @@ static int testEnqueue() {
 static int testDequeue() {
     double values[] = {1.2, 3.4, 6.8, 7.9};
 
-    Queue *queue = StaticQueue.new(NULL);
+    Queue *queue = StaticQueue.new(NULL,NULL);
     StaticQueue.enqueue(queue,&values[0]);
     StaticQueue.enqueue(queue,&values[1]);
     StaticQueue.enqueue(queue,&values[2]);
@@ -74,7 +74,7 @@ static int testDequeue() {
 static int testPeek() {
     double values[] = {1.2, 3.4, 6.8, 7.9};
 
-    Queue *queue = StaticQueue.new(NULL);
+    Queue *queue = StaticQueue.new(NULL,NULL);
     StaticQueue.enqueue(queue,&values[0]);
     StaticQueue.enqueue(queue,&values[1]);
     StaticQueue.enqueue(queue,&values[2]);
@@ -102,7 +102,7 @@ static int testPeek() {
 static int testFree() {
     double values[] = {1.2, 3.4, 6.8, 7.9};
 
-    Queue *queue = StaticQueue.new(NULL);
+    Queue *queue = StaticQueue.new(NULL,NULL);
     StaticQueue.enqueue(queue,&values[0]);
     StaticQueue.enqueue(queue,&values[1]);
     StaticQueue.enqueue(queue,&values[2]);
@@ -121,7 +121,7 @@ static int testFree() {
 static int testDoesExist() {
     double values[] = {1.2, 3.4, 6.8, 7.9};
 
-    Queue *queue = StaticQueue.new(NULL);
+    Queue *queue = StaticQueue.new(NULL,NULL);
     StaticQueue.enqueue(queue,&values[0]);
     StaticQueue.enqueue(queue,&values[1]);
     StaticQueue.enqueue(queue,&values[2]);
@@ -158,7 +158,9 @@ static void print(QueueType value){
 static void demo(){
     double values[] = {1.2, 3.4, 6.8, 7.9};
 
-    Queue *queue = StaticQueue.new(print);
+    uint8_t buffer[1024+ mapSize(1024,8)];
+    BuddyHeap heap = StaticBuddyHeap.new(buffer, sizeof(buffer),8);
+    Queue *queue = StaticQueue.new(&heap,print);
 
     StaticQueue.enqueue(queue,&values[0]);
     StaticQueue.print(queue);
@@ -183,8 +185,8 @@ static void demo(){
 }
 
 int main(){
-    test();
-//    demo();
+//    test();
+    demo();
 
     return 0;
 }
