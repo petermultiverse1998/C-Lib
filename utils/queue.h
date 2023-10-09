@@ -6,6 +6,8 @@
 #define C_LIB_QUEUE_H
 
 
+#include "buddy_heap.h"
+
 #define QueueType void*
 #define QUEUE_NULL NULL
 
@@ -18,16 +20,19 @@ typedef struct {
     int size;
     struct QueueData *front;
     struct QueueData *back;
+    BuddyHeap *heap;
 } Queue;
 
 struct QueueControl {
     /**
      * Computation Cost : O(1)\n
      * It allocates the memory for queue and return allocated Queue
-     * @printEachElementFunc : Call back function called for each data when print is called
-     * @return : Allocated Queue (!!! Must be free using free) (OR) NULL if heap is full
+     * @param heap              : Pointer to static heap
+     *                          : NULL for dynamic heap
+     * @printEachElementFunc    : Call back function called for each data when print is called
+     * @return                  : Allocated Queue (!!! Must be free using free) (OR) NULL if heap is full
      */
-    Queue *(*new)(void (*printEachElementFunc)(QueueType value));
+    Queue *(*new)(BuddyHeap *heap,void (*printEachElementFunc)(QueueType value));
 
     /**
      * Computation Cost : O(1)\n

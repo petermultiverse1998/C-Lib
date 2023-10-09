@@ -29,19 +29,19 @@ add_executable(
         signal/fft.c
         signal/fft.h
 
-#                test/test_test.c
-
-#                utils/hash_map_test.c
-#                utils/queue_test.c
-#                utils/task_test.c
+#        test/test_test.c
+#
+#        utils/hash_map_test.c
+#        utils/queue_test.c
+#        utils/task_test.c
 #        utils/static_heap_test.c
         utils/buddy_heap_test.c
-
-#                controls/lpf_test.c
-#                controls/hpf_test.c
-#                controls/pid_test.c
-
-        #        signal/fft_test.c
+#
+#        controls/lpf_test.c
+#        controls/hpf_test.c
+#        controls/pid_test.c
+#
+#        signal/fft_test.c
 
 #        main.c
 )
