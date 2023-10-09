@@ -3,13 +3,13 @@
 //
 
 #include <stdio.h>
-#include <unistd.h>
 #include "hash_map.h"
 #include "sys/time.h"
 #include "../test/test.h"
 
-extern int hashFunc(int key);
-
+static int hashFunc(int key) {
+    return key % HASH_MAP_SIZE;
+}
 static long getTimeInMicros() {
     struct timeval val;
     gettimeofday(&val, NULL);
@@ -17,7 +17,7 @@ static long getTimeInMicros() {
 }
 
 static int testNew() {
-    HashMap *map = StaticHashMap.new();
+    HashMap *map = StaticHashMap.new(NULL);
     int check = BOOLEAN_IS_TRUE(__FILE__, __LINE__, NULL != map);
     for (int i = 0; i < HASH_MAP_SIZE; ++i)
         check = check && BOOLEAN_IS_TRUE(__FILE__, __LINE__,map->entries[i]==NULL);
@@ -36,7 +36,7 @@ static int testInsert() {
     int keys[] = {1, 2, 3, 13};
     double values[] = {1.2, 3.4, 6.8, 7.9};
 
-    HashMap *map = StaticHashMap.new();
+    HashMap *map = StaticHashMap.new(NULL);
     int check = BOOLEAN_IS_TRUE(__FILE__,__LINE__,StaticHashMap.insert(map, keys[0], &values[0])!=NULL);
     check = check && BOOLEAN_IS_TRUE(__FILE__,__LINE__,StaticHashMap.insert(map, keys[1], &values[1])!=NULL);
     check = check && BOOLEAN_IS_TRUE(__FILE__,__LINE__,StaticHashMap.insert(map, keys[2], &values[2])!=NULL);
@@ -71,7 +71,7 @@ static int testGet() {
     int keys[] = {1, 2, 3, 13};
     double values[] = {1.2, 3.4, 6.8, 7.9};
 
-    HashMap *map = StaticHashMap.new();
+    HashMap *map = StaticHashMap.new(NULL);
     StaticHashMap.insert(map, keys[0], &values[0]);
     StaticHashMap.insert(map, keys[1], &values[1]);
     StaticHashMap.insert(map, keys[2], &values[2]);
@@ -93,7 +93,7 @@ static int testDelete() {
     int keys[] = {1, 2, 3, 13};
     double values[] = {1.2, 3.4, 6.8, 7.9};
 
-    HashMap *map = StaticHashMap.new();
+    HashMap *map = StaticHashMap.new(NULL);
     StaticHashMap.insert(map, keys[0], &values[0]);
     StaticHashMap.insert(map, keys[1], &values[1]);
     StaticHashMap.insert(map, keys[2], &values[2]);
@@ -123,7 +123,7 @@ static int testGetKeys() {
     int keys[] = {1, 2, 3, 13};
     double values[] = {1.2, 3.4, 6.8, 7.9};
 
-    HashMap *map = StaticHashMap.new();
+    HashMap *map = StaticHashMap.new(NULL);
     StaticHashMap.insert(map, keys[0], &values[0]);
     StaticHashMap.insert(map, keys[1], &values[1]);
     StaticHashMap.insert(map, keys[2], &values[2]);
@@ -156,7 +156,7 @@ static int testIsKeyExist() {
     int keys[] = {1, 2, 3, 13};
     double values[] = {1.2, 3.4, 6.8, 7.9};
 
-    HashMap *map = StaticHashMap.new();
+    HashMap *map = StaticHashMap.new(NULL);
     StaticHashMap.insert(map, keys[0], &values[0]);
     StaticHashMap.insert(map, keys[1], &values[1]);
     StaticHashMap.insert(map, keys[2], &values[2]);
@@ -177,7 +177,7 @@ static int testFree() {
     int keys[] = {1, 2, 3, 13};
     double values[] = {1.2, 3.4, 6.8, 7.9};
 
-    HashMap *map = StaticHashMap.new();
+    HashMap *map = StaticHashMap.new(NULL);
     StaticHashMap.insert(map, keys[0], &values[0]);
     StaticHashMap.insert(map, keys[1], &values[1]);
     StaticHashMap.insert(map, keys[2], &values[2]);
@@ -197,7 +197,7 @@ static void testPrint() {
     int keys[] = {1, 2, 3, 13};
     double values[] = {1.2, 3.4, 6.8, 7.9};
 
-    HashMap *map = StaticHashMap.new();
+    HashMap *map = StaticHashMap.new(NULL);
     StaticHashMap.insert(map, keys[0], &values[0]);
     StaticHashMap.insert(map, keys[1], &values[1]);
     StaticHashMap.insert(map, keys[2], &values[2]);
@@ -228,8 +228,11 @@ static void demo(){
     int keys[] = {1, 2, 3, 6};
     double values[] = {1.2, 3.4, 6.8, 7.9};
 
+    uint8_t buffer[1024+ mapSize(1024,8)];
+    BuddyHeap heap = StaticBuddyHeap.new(buffer, sizeof(buffer),8);
+
     //Initialized Hash map
-    HashMap *map = StaticHashMap.new();
+    HashMap *map = StaticHashMap.new(&heap);
     StaticHashMap.print(map);//Print hash map
     printf("\n");
 
@@ -243,14 +246,17 @@ static void demo(){
 
     //Get content from hash map using key
     double* valuePtr = StaticHashMap.get(map,keys[0]);
-    printf("%d -> %f\n",keys[0],*valuePtr);
+    if(valuePtr!=HASH_MAP_NULL)
+        printf("%d -> %f\n",keys[0],*valuePtr);
 
     //Get all keys
-    int mapKeys[map->size];
-    StaticHashMap.getKeys(map,mapKeys);
-    for (int i = 0; i < map->size; ++i)
-        printf("%d, ",mapKeys[i]);
-    printf("\n");
+    if(map!=NULL) {
+        int mapKeys[map->size];
+        StaticHashMap.getKeys(map, mapKeys);
+        for (int i = 0; i < map->size; ++i)
+            printf("%d, ", mapKeys[i]);
+        printf("\n");
+    }
 
     //Delete content using keys
     StaticHashMap.delete(map,keys[2]);
@@ -269,7 +275,7 @@ static void demo(){
 }
 
 int main() {
-    test();
-//    demo();
+//    test();
+    demo();
     return 0;
 }

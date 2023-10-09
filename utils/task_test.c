@@ -44,7 +44,7 @@ static int task3(){
 }
 
 static int testNew() {
-    TaskQueue *queue = StaticTaskQueue.new(NULL);
+    TaskQueue *queue = StaticTaskQueue.new(NULL,NULL);
     int check = BOOLEAN_IS_TRUE(__FILE__, __LINE__, NULL != queue);
     check = check && BOOLEAN_IS_TRUE(__FILE__, __LINE__, queue->front == NULL);
     check = check && BOOLEAN_IS_TRUE(__FILE__, __LINE__, queue->back == NULL);
@@ -59,7 +59,7 @@ static int testNew() {
 static int testEnqueue() {
     Task values[] = {task0,task1,task2,task3};
 
-    TaskQueue *queue = StaticTaskQueue.new(NULL);
+    TaskQueue *queue = StaticTaskQueue.new(NULL,NULL);
     int check = BOOLEAN_IS_TRUE(__FILE__,__LINE__,StaticTaskQueue.enqueue(queue,values[0])!=NULL);
     check = check && BOOLEAN_IS_TRUE(__FILE__,__LINE__,StaticTaskQueue.enqueue(queue,values[1])!=NULL);
     check = check && BOOLEAN_IS_TRUE(__FILE__,__LINE__,StaticTaskQueue.enqueue(queue,values[2])!=NULL);
@@ -84,7 +84,7 @@ static int testEnqueue() {
 static int testDequeue() {
     Task values[] = {task0,task1,task2,task3};
 
-    TaskQueue *queue = StaticTaskQueue.new(NULL);
+    TaskQueue *queue = StaticTaskQueue.new(NULL,NULL);
     StaticTaskQueue.enqueue(queue,values[0]);
     StaticTaskQueue.enqueue(queue,values[1]);
     StaticTaskQueue.enqueue(queue,values[2]);
@@ -112,7 +112,7 @@ static int testDequeue() {
 static int testPeek() {
     Task values[] = {task0,task1,task2,task3};
 
-    TaskQueue *queue = StaticTaskQueue.new(NULL);
+    TaskQueue *queue = StaticTaskQueue.new(NULL,NULL);
     StaticTaskQueue.enqueue(queue,values[0]);
     StaticTaskQueue.enqueue(queue,values[1]);
     StaticTaskQueue.enqueue(queue,values[2]);
@@ -141,7 +141,7 @@ static int testPeek() {
 static int testFree() {
     Task values[] = {task0,task1,task2,task3};
 
-    TaskQueue *queue = StaticTaskQueue.new(NULL);
+    TaskQueue *queue = StaticTaskQueue.new(NULL,NULL);
     StaticTaskQueue.enqueue(queue,values[0]);
     StaticTaskQueue.enqueue(queue,values[1]);
     StaticTaskQueue.enqueue(queue,values[2]);
@@ -176,7 +176,10 @@ static void print(Task task){
 static void demo(){
     Task values[] = {task0,task1,task2,task3};
 
-    TaskQueue *queue = StaticTaskQueue.new(print);
+    uint8_t buffer[1024+ mapSize(1024,8)];
+    BuddyHeap heap = StaticBuddyHeap.new(buffer, sizeof(buffer),8);
+    TaskQueue *queue = StaticTaskQueue.new(NULL,print);
+
     StaticTaskQueue.enqueue(queue,values[0]);
     StaticTaskQueue.enqueue(queue,values[1]);
     StaticTaskQueue.enqueue(queue,values[2]);
