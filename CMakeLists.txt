@@ -35,7 +35,7 @@ add_executable(
 #        utils/queue_test.c
 #        utils/task_test.c
 #        utils/static_heap_test.c
-        utils/buddy_heap_test.c
+#        utils/buddy_heap_test.c
 #
 #        controls/lpf_test.c
 #        controls/hpf_test.c
@@ -43,5 +43,19 @@ add_executable(
 #
 #        signal/fft_test.c
 
+
+
 #        main.c
+)
+
+add_executable(math
+        math/complex.c
+        math/complex.h
+        math/complex_matrix.c
+        math/complex_matrix.h
+        math/mathMain.c
+        math/polynomial.c
+        math/polynomial.h
+        math/linear.c
+        math/linear.h
 )
