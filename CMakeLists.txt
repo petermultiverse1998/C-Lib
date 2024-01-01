@@ -58,4 +58,6 @@ add_executable(math
         math/polynomial.h
         math/linear.c
         math/linear.h
+        math/matrix.c
+        math/matrix.h
 )

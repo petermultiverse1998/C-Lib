@@ -5,6 +5,8 @@
 #include "polynomial.h"
 #include "math.h"
 
+#define c StaticComplex
+
 /**
  * This will calculate all the roots
  * @param n         : Degree of polynomial
@@ -15,20 +17,20 @@
 static void getRoots(int n,Complex (*function)(Complex x,void** args),void** args,Complex* roots){
     Complex *z=roots;
     for (int k = 0; k < n; k++)
-        z[k] = StaticComplex.getFromPolar(1.0f,2.0f*(float)M_PI*(float)k/(float)n);
+        z[k] = c.getFromPolar(1.0f,2.0f*(float)M_PI*(float)k/(float)n);
     for (int iteration = 0; iteration < 10; iteration++) {
         for (int k = 0; k < n; k++) {
             Complex x = z[k];
-            Complex product = StaticComplex.get(1,0);
+            Complex product = c.get(1,0);
             for (int j = 0; j <n ; j++) {
                 if(j==k)
                     continue;
-                product = StaticComplex.dot(product,StaticComplex.sub(x,z[j]));
+                product = c.dot(product,c.sub(x,z[j]));
             }
 
             z[k] = function(x,args);
-            z[k] = StaticComplex.div(function(x,args),product);
-            z[k] = StaticComplex.sub(x,z[k]);
+            z[k] = c.div(function(x,args),product);
+            z[k] = c.sub(x,z[k]);
         }
     }
 }

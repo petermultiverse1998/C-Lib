@@ -8,6 +8,7 @@
 #include "linear.h"
 
 #define min(a, b) (a<=b?a:b)
+#define c StaticComplex
 
 //////////////////////////BASIC//////////////////////////////////////////
 /**
@@ -27,6 +28,19 @@ static ComplexMatrix get(int row, int col, Complex a[row][col]) {
 
 /**
  * This will give complex matrix
+ * @param m real matrix
+ * @return complex matrix
+ */
+static ComplexMatrix getFromMatrix(Matrix m) {
+    ComplexMatrix matrix = {.row=m.row, .col=m.col};
+    for (int i = 0; i < m.row; i++)
+        for (int j = 0; j < m.col; j++)
+            matrix.a[i][j] = c.getFromReal(m.a[i][j]);
+    return matrix;
+}
+
+/**
+ * This will give complex matrix
  * @param row row of matrix
  * @param col column of matrix
  * @param a element of matrix in 2D array of real number
@@ -36,7 +50,7 @@ static ComplexMatrix getFromReal(int row, int col, float a[row][col]) {
     ComplexMatrix matrix = {.row=row, .col=col};
     for (int i = 0; i < row; i++)
         for (int j = 0; j < col; j++)
-            matrix.a[i][j] = StaticComplex.getFromReal(a[i][j]);
+            matrix.a[i][j] = c.getFromReal(a[i][j]);
     return matrix;
 }
 
@@ -52,7 +66,7 @@ static ComplexMatrix getXY(int row, int col, float x[row][col], float y[row][col
     ComplexMatrix matrix = {.row=row, .col=col};
     for (int i = 0; i < row; i++)
         for (int j = 0; j < col; j++)
-            matrix.a[i][j] = StaticComplex.get(x[i][j], y[i][j]);
+            matrix.a[i][j] = c.get(x[i][j], y[i][j]);
     return matrix;
 }
 
@@ -60,14 +74,14 @@ static ComplexMatrix getXY(int row, int col, float x[row][col], float y[row][col
  * This will give complex matrix
  * @param row row of matrix
  * @param col column of matrix
- * @param c complex number for all the elements in matrix
+ * @param c1 complex number for all the elements in matrix
  * @return complex matrix x+iy
  */
-static ComplexMatrix getConstantMatrix(int row, int col, Complex c) {
+static ComplexMatrix getConstantMatrix(int row, int col, Complex c1) {
     ComplexMatrix matrix = {.row=row, .col=col};
     for (int i = 0; i < row; i++)
         for (int j = 0; j < col; j++)
-            matrix.a[i][j] = c;
+            matrix.a[i][j] = c1;
     return matrix;
 }
 
@@ -82,7 +96,7 @@ static ComplexMatrix getConstantMatrixFromReal(int row, int col, float x) {
     ComplexMatrix matrix = {.row=row, .col=col};
     for (int i = 0; i < row; i++)
         for (int j = 0; j < col; j++)
-            matrix.a[i][j] = StaticComplex.getFromReal(x);
+            matrix.a[i][j] = c.getFromReal(x);
     return matrix;
 }
 
@@ -128,7 +142,7 @@ static ComplexMatrix add(ComplexMatrix m1, ComplexMatrix m2) {
     ComplexMatrix m = null(m1.row, m2.col);
     for (int i = 0; i < m.row; i++)
         for (int j = 0; j < m.col; j++)
-            m.a[i][j] = StaticComplex.add(m1.a[i][j], m2.a[i][j]);
+            m.a[i][j] = c.add(m1.a[i][j], m2.a[i][j]);
     return m;
 }
 
@@ -142,7 +156,7 @@ static ComplexMatrix sub(ComplexMatrix m1, ComplexMatrix m2) {
     ComplexMatrix m = null(m1.row, m2.col);
     for (int i = 0; i < m.row; i++)
         for (int j = 0; j < m.col; j++)
-            m.a[i][j] = StaticComplex.sub(m1.a[i][j], m2.a[i][j]);
+            m.a[i][j] = c.sub(m1.a[i][j], m2.a[i][j]);
     return m;
 }
 
@@ -157,7 +171,7 @@ static ComplexMatrix dot(ComplexMatrix m1, ComplexMatrix m2) {
     for (int i = 0; i < m.row; i++)
         for (int j = 0; j < m.col; j++)
             for (int k = 0; k < m1.col; k++)
-                m.a[i][j] = StaticComplex.add(m.a[i][j], StaticComplex.dot(m1.a[i][k], m2.a[k][j]));
+                m.a[i][j] = c.add(m.a[i][j], c.dot(m1.a[i][k], m2.a[k][j]));
     return m;
 }
 
@@ -171,7 +185,7 @@ static ComplexMatrix scale(ComplexMatrix m, Complex s) {
     ComplexMatrix matrix = m;
     for (int i = 0; i < m.row; i++)
         for (int j = 0; j < m.col; j++)
-            matrix.a[i][j] = StaticComplex.dot(matrix.a[i][j], s);
+            matrix.a[i][j] = c.dot(matrix.a[i][j], s);
     return matrix;
 }
 
@@ -209,12 +223,11 @@ static Complex det(ComplexMatrix m) {
         return m.a[0][0];
     Complex sum = {0, 0};
     for (int j = 0; j < m.col; j++)
-        sum = StaticComplex.add(sum,
-                                StaticComplex.dot(
-                                        StaticComplex.dot(m.a[0][j], det(minor(m, 0, j))),
-                                        StaticComplex.pow(StaticComplex.get(-1.0f, 0.0f),
-                                                          StaticComplex.get((float) j, 0.0f))
-                                )
+        sum = c.add(sum,
+                    c.dot(
+                            c.dot(m.a[0][j], det(minor(m, 0, j))),
+                            c.pow(c.get(-1.0f, 0.0f), c.get((float) j, 0.0f))
+                    )
         );
     return sum;
 }
@@ -227,8 +240,8 @@ static Complex det(ComplexMatrix m) {
  * @return cofactor of m at (i,j)
  */
 static Complex cofactor(ComplexMatrix m, int i, int j) {
-    return StaticComplex.dot(
-            StaticComplex.pow(StaticComplex.get(-1.0f, 0.0f), StaticComplex.get((float) (i + j), 0.0f)),
+    return c.dot(
+            c.pow(c.get(-1.0f, 0.0f), c.get((float) (i + j), 0.0f)),
             det(minor(m, i, j))
     );
 }
@@ -275,10 +288,10 @@ static ComplexMatrix adjoint(ComplexMatrix m) {
  */
 static ComplexMatrix inverse(ComplexMatrix m) {
     if (m.row == 1 && m.col == 1) {
-        ComplexMatrix matrix = {.row=1, .col=1, StaticComplex.div(StaticComplex.get(1, 0), m.a[0][0])};
+        ComplexMatrix matrix = {.row=1, .col=1, c.div(c.get(1, 0), m.a[0][0])};
         return matrix;
     }
-    return scale(adjoint(m), StaticComplex.div(StaticComplex.get(1, 0), det(m)));
+    return scale(adjoint(m), c.div(c.get(1, 0), det(m)));
 }
 
 /**
@@ -289,12 +302,12 @@ static ComplexMatrix inverse(ComplexMatrix m) {
 static ComplexMatrix normalise(ComplexMatrix m) {
     ComplexMatrix matrix = m;
     for (int j = 0; j < matrix.col; j++) {
-        Complex sum = StaticComplex.get(0, 0);
+        Complex sum = c.get(0, 0);
         for (int i = 0; i < matrix.row; i++)
-            sum = StaticComplex.add(sum, StaticComplex.dot(matrix.a[i][j], StaticComplex.conjugate(matrix.a[i][j])));
-        sum = StaticComplex.pow(sum,StaticComplex.getFromReal(0.5f));
+            sum = c.add(sum, c.dot(matrix.a[i][j], c.conjugate(matrix.a[i][j])));
+        sum = c.pow(sum, c.getFromReal(0.5f));
         for (int i = 0; i < matrix.row; i++)
-            matrix.a[i][j] = StaticComplex.div(matrix.a[i][j], sum);
+            matrix.a[i][j] = c.div(matrix.a[i][j], sum);
     }
     return matrix;
 }
@@ -308,7 +321,7 @@ static ComplexMatrix conjugate(ComplexMatrix m) {
     ComplexMatrix matrix = {.row=m.col,.col=m.row};
     for (int i = 0; i < matrix.row; i++)
         for (int j = 0; j < matrix.col; j++)
-            matrix.a[i][j] = StaticComplex.conjugate(m.a[j][i]);
+            matrix.a[i][j] = c.conjugate(m.a[j][i]);
     return matrix;
 }
 
@@ -325,7 +338,7 @@ static int rank(ComplexMatrix m) {
         A = dot(transpose(m), m);
     A = normalise(A);
     for (int rank = A.row; rank > 0; rank--) {
-        if (StaticComplex.mag(det(A)) < 0.001f) {
+        if (c.mag(det(A)) < 0.001f) {
             ComplexMatrix temp = identity(A.row - 1);
             for (int i = 0; i < temp.row; i++)
                 for (int j = 0; j < temp.col; ++j)
@@ -350,20 +363,20 @@ static int rank(ComplexMatrix m) {
 static ComplexMatrix givenRotationMatrix(ComplexMatrix m,int i1, int i2) {
     int j = i1;
     ComplexMatrix matrix = identity(m.row);
-    Complex r = StaticComplex.pow(
-            StaticComplex.add(
-                    StaticComplex.pow(m.a[i1][j], StaticComplex.get(2, 0)),
-                    StaticComplex.pow(m.a[i2][j], StaticComplex.get(2, 0))
+    Complex r = c.pow(
+            c.add(
+                    c.dot(m.a[i1][j], m.a[i1][j]),
+                    c.dot(m.a[i2][j], m.a[i2][j])
             ),
-            StaticComplex.get(0.5f, 0)
+            c.get(0.5f, 0)
     );
     int diff = i2 - i1;
-    Complex c = StaticComplex.div(m.a[i1][j], r);
-    Complex s = StaticComplex.div(StaticComplex.dot(StaticComplex.get(-1, 0), m.a[i2][j]), r);
-    matrix.a[i1][j] = c;
-    matrix.a[i1][j + diff] = StaticComplex.dot(StaticComplex.get(-1, 0), s);
-    matrix.a[i2][j] = s;
-    matrix.a[i2][j + diff] = c;
+    Complex cos = c.div(m.a[i1][j], r);
+    Complex sine = c.div(m.a[i2][j], r);
+    matrix.a[i1][j] = cos;
+    matrix.a[i1][j + diff] = sine;
+    matrix.a[i2][j] = c.dot(c.getFromReal(-1), sine);
+    matrix.a[i2][j + diff] = cos;
     return matrix;
 }
 
@@ -436,9 +449,9 @@ static int isIdentityMatrix(ComplexMatrix m) {
     for (int i = 0; i < m.row; i++)
         for (int j = 0; j < m.col; j++)
             if ((i == j) &&
-                (StaticComplex.mag(StaticComplex.sub(m.a[i][j], StaticComplex.get(1, 0))) > COMPLEX_EPSILON)) {
+                (c.mag(c.sub(m.a[i][j], c.get(1, 0))) > COMPLEX_EPSILON)) {
                 return 0;
-            } else if (StaticComplex.mag(m.a[i][j]) > COMPLEX_EPSILON)
+            } else if (c.mag(m.a[i][j]) > COMPLEX_EPSILON)
                 return 0;
     return 1;
 }
@@ -451,7 +464,7 @@ static int isIdentityMatrix(ComplexMatrix m) {
 static int isDiagonalMatrix(ComplexMatrix m) {
     for (int i = 0; i < m.row; i++)
         for (int j = 0; j < m.col; j++)
-            if ((i != j) && (StaticComplex.mag(m.a[i][j]) > COMPLEX_EPSILON))
+            if ((i != j) && (c.mag(m.a[i][j]) > COMPLEX_EPSILON))
                 return 0;
     return 1;
 }
@@ -464,7 +477,7 @@ static int isDiagonalMatrix(ComplexMatrix m) {
 static int isNullMatrix(ComplexMatrix m) {
     for (int i = 0; i < m.row; i++)
         for (int j = 0; j < m.col; j++)
-            if (StaticComplex.mag(m.a[i][j]) > COMPLEX_EPSILON)
+            if (c.mag(m.a[i][j]) > COMPLEX_EPSILON)
                 return 0;
     return 1;
 }
@@ -487,54 +500,38 @@ static void getEigenDecompose(ComplexMatrix m, ComplexMatrix *V, ComplexMatrix *
         *V = identity(m.row);
         return;
     }
+
+    //Find magnitude of each vector
+    Complex mag = c.get(0, 0);
+    for (int j = 0; j < m.col; j++)
+        for (int i = 0; i < m.row; i++)
+            mag = c.add(mag, c.dot(m.a[i][j], c.conjugate(m.a[i][j])));
+    mag = c.pow(mag, c.getFromReal(0.5f));
+
+    // Scale matrix
+    m = scale(m, c.div(c.getFromReal(1.0f), mag));
+
     Complex roots[m.row];
     void *args[1] = {&m};
     StaticPolynomial.getRoots(m.row, eigenCharacteristicsFunction, args, roots);
+    for (int i = 0; i < m.row; ++i) {
+        for (int j = i + 1; j < m.row; ++j) {
+            if (c.mag(roots[i]) > c.mag(roots[j]))
+                continue;
+            Complex temp = roots[j];
+            roots[j] = roots[i];
+            roots[i] = temp;
+        }
+    }
 
     *D = null(m.row, m.col);
     *V = identity(m.row);
     for (int i = 0; i < D->row; i++)
-        D->a[i][i] = StaticComplex.sub(StaticComplex.get(0, 0), roots[i]);
-    for (int n = 0; n < D->row; n++) {
-        ComplexMatrix A = sub(m, scale(identity(D->row), D->a[n][n]));
-        ComplexMatrix X;
-        if (!isNullMatrix(A)) {
-            X = StaticLinear.solveHomogeneous(A);
-        } else {
-            X = null(A.row, 1);
-            X.a[n][0] = StaticComplex.get(1.0f, 0.0f);
-        }
-        X = normalise(X);
-        for (int i = 0; i < V->col; ++i)
-            V->a[i][n] = X.a[i][0];
-    }
-}
+        D->a[i][i] = c.sub(c.getFromReal(0), roots[i]);
 
-/**
- * Gives eigen decomposition of given matrix using QR method(m = V x D).
- * Only works for symmetric matrix
- * @param m given matrix
- * @param V eigen vector matrix
- * @param D eigen value matrix
- */
-static void getEigenDecomposeQR(ComplexMatrix m, ComplexMatrix *V, ComplexMatrix *D) {
-    if (isDiagonalMatrix(m)) {
-        *D = m;
-        *V = identity(m.row);
-        return;
-    }
-    *D = m;
-    ComplexMatrix Q;
-    ComplexMatrix R;
-    *V = identity(m.row);
-    for (int i = 0; i < COMPLEX_MATRIX_QR_EIGEN_ITERATION; i++) {
-        getQRWithGiven(*D, &Q, &R);
-        *D = dot(R, Q);
-    }
-    for (int i = 0; i < D->row; ++i)
-        for (int j = 0; j < D->col; ++j)
-            if (i != j)
-                D->a[i][j] = StaticComplex.get(0, 0);
+    // Re-scaling
+    *D = scale(*D, mag);
+    m = scale(m, mag);
 
     for (int n = 0; n < D->row; n++) {
         ComplexMatrix A = sub(m, scale(identity(D->row), D->a[n][n]));
@@ -543,7 +540,7 @@ static void getEigenDecomposeQR(ComplexMatrix m, ComplexMatrix *V, ComplexMatrix
             X = StaticLinear.solveHomogeneous(A);
         } else {
             X = null(A.row, 1);
-            X.a[n][0] = StaticComplex.get(1.0f, 0.0f);
+            X.a[n][0] = c.get(1.0f, 0.0f);
         }
         X = normalise(X);
         for (int i = 0; i < V->col; ++i)
@@ -562,180 +559,144 @@ static void getSVDDecompose(ComplexMatrix m, ComplexMatrix *U, ComplexMatrix *S,
     ComplexMatrix A = m;
     if (A.row >= A.col) {
         ComplexMatrix AAt = dot(A, conjugate(A));
+        StaticComplexMatrix.print(AAt);
+        printf("\n");
 
-        ComplexMatrix D;
-        getEigenDecompose(AAt, U, &D);
         ////////////LEFT SINGULAR MATRIX//////////////////
-
-        //ASCENDING
-        for (int i = 0; i < D.row - 1; i++) {
-            for (int j = i; j < D.row - 1; j++) {
-                if (StaticComplex.mag(D.a[j][j]) < StaticComplex.mag(D.a[j + 1][j + 1])) {
-                    Complex temp = D.a[j][j];
-                    D.a[j][j] = D.a[j + 1][j + 1];
-                    D.a[j + 1][j + 1] = temp;
-
-                    for (int k = 0; k < U->col; ++k) {
-                        Complex tempV = U->a[j][k];
-                        U->a[j][k] = U->a[j + 1][k];
-                        U->a[j + 1][k] = tempV;
-                    }
-                }
-            }
+        ComplexMatrix D = AAt;
+        ComplexMatrix Q, R;
+        *U = identity(D.row);
+        for (int i = 0; i < COMPLEX_MATRIX_QR_EIGEN_ITERATION; ++i) {
+            getQRWithGiven(D, &Q, &R);
+            D = dot(R, Q);
+            *U = dot(*U, Q);
         }
 
         ////////SINGULAR MATRIX//////////////
         *S = null(A.row, A.col);
         for (int i = 0; i < min(S->row, S->col); i++)
-            S->a[i][i] = StaticComplex.pow(D.a[i][i], StaticComplex.get(0.5f, 0));
+            S->a[i][i] = c.pow(D.a[i][i], c.getFromReal(0.5f));
 
         ////////////RIGHT SINGULAR MATRIX//////////////////
         ComplexMatrix S_inv = transpose(*S);
         for (int i = 0; i < min(S->row, S->col); i++)
-            S_inv.a[i][i] = StaticComplex.div(StaticComplex.get(1, 0), S->a[i][i]);
+            S_inv.a[i][i] = c.div(c.getFromReal(1), S_inv.a[i][i]);
         *V = dot(S_inv, dot(conjugate(*U), A));
         *V = conjugate(*V);
     } else {
         ComplexMatrix AtA = dot(conjugate(A), A);
-        ComplexMatrix D;
-        getEigenDecompose(AtA, V, &D);
         ////////////RIGHT SINGULAR MATRIX//////////////////
-
-        //ASCENDING
-        for (int i = 0; i < D.row - 1; i++) {
-            for (int j = i; j < D.row - 1; j++) {
-                if (StaticComplex.mag(D.a[j][j]) < StaticComplex.mag(D.a[j + 1][j + 1])) {
-                    Complex temp = D.a[j][j];
-                    D.a[j][j] = D.a[j + 1][j + 1];
-                    D.a[j + 1][j + 1] = temp;
-
-                    for (int k = 0; k < U->col; ++k) {
-                        Complex tempV = U->a[j][k];
-                        V->a[j][k] = V->a[j + 1][k];
-                        V->a[j + 1][k] = tempV;
-                    }
-                }
-            }
+        ComplexMatrix D = AtA;
+        ComplexMatrix Q, R;
+        *V = identity(D.row);
+        for (int i = 0; i < COMPLEX_MATRIX_QR_EIGEN_ITERATION; ++i) {
+            getQRWithGiven(D, &Q, &R);
+            D = dot(R, Q);
+            *V = dot(*V, Q);
         }
 
         ////////SINGULAR MATRIX//////////////
         *S = null(A.row, A.col);
         for (int i = 0; i < min(S->row, S->col); i++)
-            S->a[i][i] = StaticComplex.pow(D.a[i][i], StaticComplex.get(0.5f, 0));
+            S->a[i][i] = c.pow(D.a[i][i], c.get(0.5f, 0));
 
         ////////////LEFT SINGULAR MATRIX//////////////////
         ComplexMatrix S_inv = transpose(*S);
         for (int i = 0; i < S_inv.col; i++)
-            S_inv.a[i][i] = StaticComplex.div(StaticComplex.get(1, 0), S_inv.a[i][i]);
+            S_inv.a[i][i] = c.div(c.get(1, 0), S_inv.a[i][i]);
         *U = dot(A, dot(*V, S_inv));
     }
 }
 
+///////////////////////////OPERATIONS///////////////////////////////////////////////////
 /**
- * Gives singular value decomposition of given matrix using QR method (m = U * S x conjugate(V))
- * @param m given matrix of size (r x c)
- * @param U Unitary matrix of size (r x r)
- * @param S Rectangular diagonal matrix of size (r x c)
- * @param V Unitary matrix of size (c x c)
+ * Returns matrix applying function f to each diagonal element
+ * @param f function that take complex number and return complex number
+ * @param m give matrix
+ * @return modified matrix
  */
-static void getSVDDecomposeQR(ComplexMatrix m, ComplexMatrix *U, ComplexMatrix *S, ComplexMatrix *V) {
-    ComplexMatrix A = m;
-    if (A.row >= A.col) {
-        ComplexMatrix AAt = dot(A, conjugate(A));
-        ComplexMatrix D = AAt;
-        for (int i = 0; i < COMPLEX_MATRIX_QR_EIGEN_ITERATION; i++) {
-            ComplexMatrix Q, R;
-            getQRWithGiven(D, &Q, &R);
-            D = dot(R, Q);
-        }
+static ComplexMatrix diagonalOperation(Complex (*f)(Complex x), ComplexMatrix m) {
+    for (int i = 0; i < min(m.row, m.col); ++i)
+        m.a[i][i] = f(m.a[i][i]);
+    return m;
+}
 
-        //ASCENDING
-        for (int i = 0; i < D.row - 1; i++) {
-            for (int j = i; j < D.row - 1; j++) {
-                if (StaticComplex.mag(D.a[j][j]) < StaticComplex.mag(D.a[j + 1][j + 1])) {
-                    Complex temp = D.a[j][j];
-                    D.a[j][j] = D.a[j + 1][j + 1];
-                    D.a[j + 1][j + 1] = temp;
-                }
-            }
-        }
+/**
+ * Returns matrix applying function f to each element
+ * @param f function that takes complex number and return complex number
+ * @param m give matrix
+ * @return modified matrix
+ */
+static ComplexMatrix elementWiseOperation(Complex (*f)(Complex x), ComplexMatrix m) {
+    for (int i = 0; i < m.row; ++i)
+        for (int j = 0; j < m.col; ++j)
+            m.a[i][j] = f(m.a[i][j]);
+    return m;
+}
 
-        ////////////LEFT SINGULAR MATRIX//////////////////
-        *U = identity(AAt.row);
-        ComplexMatrix temp;
-        for (int n = 0; n < AAt.row; n++) {
-            temp = sub(AAt, scale(identity(AAt.row), D.a[n][n]));
-            ComplexMatrix X;
-            if (!isNullMatrix(temp)) {
-                X = StaticLinear.solveHomogeneous(temp);
-            } else {
-                X = null(A.row, 1);
-                X.a[n][0] = StaticComplex.get(1.0f, 0.0f);
-            }
-            X = normalise(X);
-            for (int j = 0; j < U->col; ++j)
-                U->a[n][j] = X.a[j][0];
-        }
+/**
+ * This returns matrix after applying analytical function (should be taylor expansion!!!)
+ * @param f analytic function that takes complex number and return complex number
+ * @param m give matrix
+ * @return modified matrix
+ */
+static ComplexMatrix analyticFunction(Complex (*f)(Complex x), ComplexMatrix m) {
+    if (isDiagonalMatrix(m))
+        return diagonalOperation(f, m);
 
-        ////////SINGULAR MATRIX//////////////
-        *S = null(A.row, A.col);
-        for (int i = 0; i < min(S->row, S->col); i++)
-            S->a[i][i] = StaticComplex.pow(D.a[i][i], StaticComplex.get(0.5f, 0));
+    ComplexMatrix V, D;
+    getEigenDecompose(m, &V, &D);
+    return dot(dot(V, diagonalOperation(f, D)), inverse(V));
+}
 
-        ////////////RIGHT SINGULAR MATRIX//////////////////
-        ComplexMatrix S_inv = transpose(*S);
-        for (int i = 0; i < S_inv.row; i++)
-            S_inv.a[i][i] = StaticComplex.div(StaticComplex.get(1, 0), S_inv.a[i][i]);
-        *V = dot(S_inv, dot(conjugate(*U), A));
-        *V = conjugate(*V);
-
-    } else {
-        ComplexMatrix AtA = dot(conjugate(A), A);
-        ComplexMatrix D = AtA;
-        for (int i = 0; i < 100; i++) {
-            ComplexMatrix Q, R;
-            getQRWithGiven(D, &Q, &R);
-            D = dot(R, Q);
-        }
-
-        //ASCENDING
-        for (int i = 0; i < D.row - 1; i++) {
-            for (int j = i; j < D.row - 1; j++) {
-                if (StaticComplex.mag(D.a[j][j]) < StaticComplex.mag(D.a[j + 1][j + 1])) {
-                    Complex temp = D.a[j][j];
-                    D.a[j][j] = D.a[j + 1][j + 1];
-                    D.a[j + 1][j + 1] = temp;
-                }
-            }
-        }
-
-        ////////////RIGHT SINGULAR MATRIX//////////////////
-        *V = identity(AtA.row);
-        ComplexMatrix temp;
-        for (int n = 0; n < AtA.row; n++) {
-            temp = sub(AtA, scale(identity(AtA.row), D.a[n][n]));
-            ComplexMatrix X;
-            if (!isNullMatrix(temp)) {
-                X = StaticLinear.solveHomogeneous(temp);
-            } else {
-                X = null(A.row, 1);
-                X.a[n][0] = StaticComplex.get(1.0f, 0.0f);
-            }
-            for (int j = 0; j < V->col; ++j)
-                V->a[n][j] = X.a[j][0];
-        }
-
-        ////////SINGULAR MATRIX//////////////
-        *S = null(A.row, A.col);
-        for (int i = 0; i < min(S->row, S->col); i++)
-            S->a[i][i] = StaticComplex.pow(D.a[i][i], StaticComplex.get(0.5f, 0));
-
-        ////////////RIGHT SINGULAR MATRIX//////////////////
-        ComplexMatrix S_inv = transpose(*S);
-        for (int i = 0; i < S_inv.col; i++)
-            S_inv.a[i][i] = StaticComplex.div(StaticComplex.get(1, 0), S_inv.a[i][i]);
-        *U = dot(S_inv, dot(*V, A));
+/**
+ * This returns matrix after applying analytical function (should be taylor expansion!!!)
+ * @param f analytic function that takes two complex number and return complex number
+ * @param m given matrix
+ * @param c1 given complex number
+ * @return modified matrix
+ */
+static ComplexMatrix analyticFunction2(Complex (*f)(Complex x, Complex c1), ComplexMatrix m, Complex c1) {
+    if (isDiagonalMatrix(m)) {
+        for (int i = 0; i < min(m.row, m.col); ++i)
+            m.a[i][i] = f(m.a[i][i], c1);
+        return m;
     }
+
+    ComplexMatrix V, D;
+    getEigenDecompose(m, &V, &D);
+    for (int i = 0; i < min(D.row, D.col); ++i)
+        D.a[i][i] = f(D.a[i][i], c1);
+    return dot(dot(V, D), inverse(V));
+}
+
+//////////////////////////EXPONENTIAL, LOGARITHMIC AND POWER/////////////////////////////
+/**
+ * Gives exponential of matrix
+ * @param m given matrix
+ * @return exp(m)
+ */
+static ComplexMatrix expm(ComplexMatrix m) {
+    return analyticFunction(c.exp, m);
+}
+
+/**
+ * Gives natural log of matrix
+ * @param m given matrix
+ * @return ln(m)
+ */
+static ComplexMatrix lnm(ComplexMatrix m) {
+    return analyticFunction(c.ln, m);
+}
+
+/**
+ * Gives pow of matrix raise to complex number
+ * @param m given matrix
+ * @param c given complex number
+ * @return m^c
+ */
+static ComplexMatrix powm(ComplexMatrix m, Complex c1) {
+    return analyticFunction2(c.pow, m, c1);
 }
 
 ////////////////////////PRINTING////////////////////////////////////
@@ -746,7 +707,7 @@ static void getSVDDecomposeQR(ComplexMatrix m, ComplexMatrix *U, ComplexMatrix *
 static void print(ComplexMatrix m) {
     for (int i = 0; i < m.row; ++i) {
         for (int j = 0; j < m.col; ++j) {
-            StaticComplex.print(m.a[i][j]);
+            c.print(m.a[i][j]);
             printf("    ");
         }
         printf("\n");
@@ -760,15 +721,82 @@ static void print(ComplexMatrix m) {
 static void printA(ComplexMatrix m) {
     for (int i = 0; i < m.row; ++i) {
         for (int j = 0; j < m.col; ++j) {
-            StaticComplex.printA(m.a[i][j]);
+            c.printA(m.a[i][j]);
             printf("    ");
         }
         printf("\n");
     }
 }
 
+/////////////////////////CONVERSION///////////////////
+/**
+ * Convert complex matrix to real matrix
+ * @param m given complex matrix
+ * @return only magnitude of complex matrix
+ */
+static Matrix toMatrix(ComplexMatrix m) {
+    Matrix matrix = {.row = m.row, .col=m.col};
+    for (int i = 0; i < m.row; ++i)
+        for (int j = 0; j < m.col; ++j)
+            matrix.a[i][j] = m.a[i][j].x;
+    return matrix;
+}
+
+/**
+ * Convert complex matrix to real matrix
+ * @param m given complex matrix
+ * @return real part of complex matrix
+ */
+static Matrix toMatrixX(ComplexMatrix m) {
+    Matrix matrix = {.row = m.row, .col=m.col};
+    for (int i = 0; i < m.row; ++i)
+        for (int j = 0; j < m.col; ++j)
+            matrix.a[i][j] = c.mag(m.a[i][j]);
+    return matrix;
+}
+
+/**
+ * Convert complex matrix to real matrix
+ * @param m given complex matrix
+ * @return imaginary part of complex matrix
+ */
+static Matrix toMatrixY(ComplexMatrix m) {
+    Matrix matrix = {.row = m.row, .col=m.col};
+    for (int i = 0; i < m.row; ++i)
+        for (int j = 0; j < m.col; ++j)
+            matrix.a[i][j] = m.a[i][j].y;
+    return matrix;
+}
+
+/**
+ * Convert complex matrix to real matrix
+ * @param m given complex matrix
+ * @return magnitude part of complex matrix
+ */
+static Matrix toMatrixMag(ComplexMatrix m) {
+    Matrix matrix = {.row = m.row, .col=m.col};
+    for (int i = 0; i < m.row; ++i)
+        for (int j = 0; j < m.col; ++j)
+            matrix.a[i][j] = c.mag(m.a[i][j]);
+    return matrix;
+}
+
+/**
+ * Convert complex matrix to real matrix
+ * @param m given complex matrix
+ * @return phase part of complex matrix
+ */
+static Matrix toMatrixPhase(ComplexMatrix m) {
+    Matrix matrix = {.row = m.row, .col=m.col};
+    for (int i = 0; i < m.row; ++i)
+        for (int j = 0; j < m.col; ++j)
+            matrix.a[i][j] = c.angle(m.a[i][j]);
+    return matrix;
+}
+
 __attribute__((unused)) struct ComplexMatrixControl StaticComplexMatrix = {
         .get = get,
+        .getFromMatrix = getFromMatrix,
         .getFromReal = getFromReal,
         .getXY = getXY,
         .getConstantMatrix = getConstantMatrix,
@@ -796,9 +824,19 @@ __attribute__((unused)) struct ComplexMatrixControl StaticComplexMatrix = {
         .isDiagonalMatrix = isDiagonalMatrix,
         .isNullMatrix = isNullMatrix,
         .getEigenDecompose = getEigenDecompose,
-        .getEigenDecomposeQR = getEigenDecomposeQR,
         .getSVDDecompose = getSVDDecompose,
-        .getSVDDecomposeQR = getSVDDecomposeQR,
+        .diagonalOperation = diagonalOperation,
+        .elementWiseOperation = elementWiseOperation,
+        .analyticFunction = analyticFunction,
+        .analyticFunction2 = analyticFunction2,
+        .exp = expm,
+        .ln = lnm,
+        .pow = powm,
         .print = print,
-        .printA = printA
+        .printA = printA,
+        .toMatrix = toMatrix,
+        .toMatrixX = toMatrixX,
+        .toMatrixY = toMatrixY,
+        .toMatrixMag = toMatrixMag,
+        .toMatrixPhase = toMatrixPhase
 };

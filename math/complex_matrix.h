@@ -5,9 +5,10 @@
 #ifndef C_LIB_COMPLEX_MATRIX_H
 #define C_LIB_COMPLEX_MATRIX_H
 #include "complex.h"
+#include "matrix.h"
 
 #define COMPLEX_MATRIX_MAX_SIZE 4
-#define COMPLEX_MATRIX_QR_EIGEN_ITERATION 200
+#define COMPLEX_MATRIX_QR_EIGEN_ITERATION 300
 
 typedef struct {
     int row;
@@ -25,6 +26,13 @@ struct ComplexMatrixControl{
      * @return complex matrix
      */
     ComplexMatrix (*get)(int row, int col, Complex a[row][col]);
+
+    /**
+     * This will give complex matrix
+     * @param m real matrix
+     * @return complex matrix
+     */
+    ComplexMatrix (*getFromMatrix)(Matrix m);
 
     /**
      * This will give complex matrix
@@ -187,7 +195,7 @@ struct ComplexMatrixControl{
      */
     int (*rank)(ComplexMatrix m);
 
-    /////////////////////////SPECIAL OPERATIONS//////////////////////////
+    /////////////////////////DECOMPOSITION//////////////////////////
     /**
      * Gives Given Rotation's matrix. this makes (i2,j) element 0 after operation on given matrix
      * @param m given matrix
@@ -243,14 +251,6 @@ struct ComplexMatrixControl{
      void (*getEigenDecompose)(ComplexMatrix m, ComplexMatrix *V, ComplexMatrix *D);
 
     /**
-     * Gives eigen decomposition of given matrix using QR method(m = V x D)
-     * @param m given matrix
-     * @param V eigen vector matrix
-     * @param D eigen value matrix
-     */
-    void (*getEigenDecomposeQR)(ComplexMatrix m, ComplexMatrix *V, ComplexMatrix *D);
-
-    /**
      * Gives singular value decomposition of given matrix (m = U * S x conjugate(V))
      * @param m given matrix of size (r x c)
      * @param U Unitary matrix of size (r x r)
@@ -259,14 +259,62 @@ struct ComplexMatrixControl{
      */
     void (*getSVDDecompose)(ComplexMatrix m, ComplexMatrix *U, ComplexMatrix *S, ComplexMatrix *V);
 
+    ///////////////////////////OPERATIONS///////////////////////////////////////////////////
     /**
-     * Gives singular value decomposition of given matrix using QR method (m = U * S x conjugate(V))
-     * @param m given matrix of size (r x c)
-     * @param U Unitary matrix of size (r x r)
-     * @param S Rectangular diagonal matrix of size (r x c)
-     * @param V Unitary matrix of size (c x c)
+     * Returns matrix applying function f to each diagonal element
+     * @param f function that take complex number and return complex number
+     * @param m give matrix
+     * @return modified matrix
      */
-    void (*getSVDDecomposeQR)(ComplexMatrix m, ComplexMatrix *U, ComplexMatrix *S, ComplexMatrix *V);
+    ComplexMatrix (*diagonalOperation)(Complex (*f)(Complex x),ComplexMatrix m);
+
+    /**
+     * Returns matrix applying function f to each element
+     * @param f function that takes complex number and return complex number
+     * @param m give matrix
+     * @return modified matrix
+     */
+    ComplexMatrix (*elementWiseOperation)(Complex (*f)(Complex x), ComplexMatrix m);
+
+    /**
+     * This returns matrix after applying analytical function (should be taylor expansion!!!)
+     * @param f analytic function that takes complex number and return complex number
+     * @param m give matrix
+     * @return modified matrix
+     */
+    ComplexMatrix (*analyticFunction)(Complex (*f)(Complex x),ComplexMatrix  m);
+
+    /**
+     * This returns matrix after applying analytical function (should be taylor expansion!!!)
+     * @param f analytic function that takes two complex number and return complex number
+     * @param m given matrix
+     * @param c given complex number
+     * @return modified matrix
+     */
+    ComplexMatrix (*analyticFunction2)(Complex (*f)(Complex x,Complex c),ComplexMatrix  m,Complex c);
+
+    //////////////////////////EXPONENTIAL, LOGARITHMIC AND POWER/////////////////////////////
+    /**
+     * Gives exponential of matrix
+     * @param m given matrix
+     * @return exp(m)
+     */
+    ComplexMatrix (*exp)(ComplexMatrix m);
+
+    /**
+     * Gives natural log of matrix
+     * @param m given matrix
+     * @return ln(m)
+     */
+    ComplexMatrix (*ln)(ComplexMatrix m);
+
+    /**
+     * Gives pow of matrix raise to complex number
+     * @param m given matrix
+     * @param c given complex number
+     * @return m^c
+     */
+    ComplexMatrix (*pow)(ComplexMatrix m,Complex c);
 
     ////////////////////////PRINTING////////////////////////////////////
     /**
@@ -280,6 +328,42 @@ struct ComplexMatrixControl{
      * @param m given matrix
      */
     void (*printA)(ComplexMatrix m);
+
+    /////////////////////////CONVERSION///////////////////
+    /**
+     * Convert complex matrix to real matrix
+     * @param m given complex matrix
+     * @return only magnitude of complex matrix
+     */
+    Matrix (*toMatrix)(ComplexMatrix m);
+
+    /**
+     * Convert complex matrix to real matrix
+     * @param m given complex matrix
+     * @return real part of complex matrix
+     */
+    Matrix (*toMatrixX)(ComplexMatrix m);
+
+    /**
+     * Convert complex matrix to real matrix
+     * @param m given complex matrix
+     * @return imaginary part of complex matrix
+     */
+    Matrix (*toMatrixY)(ComplexMatrix m);
+
+    /**
+     * Convert complex matrix to real matrix
+     * @param m given complex matrix
+     * @return magnitude part of complex matrix
+     */
+    Matrix (*toMatrixMag)(ComplexMatrix m);
+
+    /**
+     * Convert complex matrix to real matrix
+     * @param m given complex matrix
+     * @return phase part of complex matrix
+     */
+    Matrix (*toMatrixPhase)(ComplexMatrix m);
 };
 
 __attribute__((unused)) extern struct ComplexMatrixControl StaticComplexMatrix;
